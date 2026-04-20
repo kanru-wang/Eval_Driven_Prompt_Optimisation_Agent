@@ -1,0 +1,5 @@
+.venv
+*.pyc
+src/eval_driven_prompt_optimisation_agent.egg-info
+tests
+.vscode/settings.json

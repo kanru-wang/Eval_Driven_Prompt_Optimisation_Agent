@@ -1,0 +1,17 @@
+[project]
+name = "eval-driven-prompt-optimisation-agent"
+version = "0.1.0"
+description = "Iterative OpenAI LLM prompt optimisation agent for complaint classification."
+requires-python = ">=3.10"
+dependencies = [
+    "openai>=1.0.0",
+]
+
+[project.scripts]
+promptopt-agent = "promptopt_agent.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

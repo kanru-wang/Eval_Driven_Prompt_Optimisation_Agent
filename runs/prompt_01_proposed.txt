@@ -1,0 +1,13 @@
+You classify short retail banking complaints. Choose exactly one class label from the allowed list below. Return a JSON object with fields: class_label (one of the allowed labels), confidence (numeric), rationale (brief justification based only on the complaint text). Do not mention or rely on ground-truth labels or external information. The rationale should be a concise sentence or two that cites phrases from the complaint.
+
+Disambiguation guidance (based on error analysis and sampled error cases):
+- Card vs Charge vs Dispute vs Security:
+  • Look for mentions of authorization holds, pending authorisations, or preauthorisations. When there is a card hold or preauth without a settled charge, map to Card Charge Review. When there is a posted charge that is disputed, map to Card Payment Dispute. When the issue centers on fraud/suspicious usage around a card payment, map to Card Security Concern.
+- Account lifecycle:
+  • If the text mentions KYC, source of funds, onboarding steps, or requests to reopen an account, decide between Account Review Request (in‑review), Account Restriction Notice (AML/compliance hold), or Account Access Issue (login/onboarding problems) using explicit cues: mentions of KYC/review/opening -> Account Review Request; AML block/hold -> Account Restriction Notice; login/onboarding problems -> Account Access Issue.
+- Transfers/payments:
+  • AML/compliance restrictions on transfers -> Account Restriction Notice. Direct debit problems or transfer failures: decide based on whether the complaint describes a failure/dishonour vs a delay; use Transfer Processing Delay for delays, Transfer Detail Error for specific transfer details.
+- Loans:
+  • Distinguish rate/terms questions (rate, APR, break cost) from payoff/charge issues (discharge quote, payoff amount). Rate/terms -> Loan Rate Query; payoff/charges -> Loan Payment Issue.
+
+If a case in the error analysis shows overlapping cues, prefer the more specific label as indicated above. Output a single JSON object with class_label from the allowed list, a numeric 0-1 confidence, and a rationale derived from the complaint text.

@@ -1,0 +1,1218 @@
+{
+  "iteration": 1,
+  "prompt_used": "You classify short retail banking complaints.\n\nChoose exactly one class label from the allowed list. The labels are short and\nsome are intentionally similar, so rely on the customer's complaint wording.\n\nReturn JSON only with this shape:\n{\n  \"class_label\": \"one allowed class label\",\n  \"confidence\": 0.0,\n  \"rationale\": \"brief reason using only complaint text\"\n}\n",
+  "accuracy": 0.82,
+  "top_confusions": [
+    {
+      "true_label": "Card Charge Review",
+      "predicted_label": "Card Payment Dispute",
+      "count": 9
+    },
+    {
+      "true_label": "Account Review Request",
+      "predicted_label": "Account Access Issue",
+      "count": 2
+    },
+    {
+      "true_label": "Account Restriction Notice",
+      "predicted_label": "Transfer Processing Delay",
+      "count": 2
+    },
+    {
+      "true_label": "Account Review Request",
+      "predicted_label": "Account Restriction Notice",
+      "count": 2
+    },
+    {
+      "true_label": "Card Security Concern",
+      "predicted_label": "Card Payment Dispute",
+      "count": 1
+    },
+    {
+      "true_label": "Loan Rate Query",
+      "predicted_label": "Loan Payment Issue",
+      "count": 1
+    },
+    {
+      "true_label": "Loan Payment Issue",
+      "predicted_label": "Transfer Processing Delay",
+      "count": 1
+    }
+  ],
+  "confusion_matrix": {
+    "Card Payment Dispute": {
+      "Card Payment Dispute": 10,
+      "Card Charge Review": 0,
+      "Card Security Concern": 0,
+      "Account Access Issue": 0,
+      "Account Review Request": 0,
+      "Account Restriction Notice": 0,
+      "Transfer Processing Delay": 0,
+      "Transfer Detail Error": 0,
+      "Loan Payment Issue": 0,
+      "Loan Rate Query": 0,
+      "INVALID_LABEL": 0
+    },
+    "Card Charge Review": {
+      "Card Payment Dispute": 9,
+      "Card Charge Review": 1,
+      "Card Security Concern": 0,
+      "Account Access Issue": 0,
+      "Account Review Request": 0,
+      "Account Restriction Notice": 0,
+      "Transfer Processing Delay": 0,
+      "Transfer Detail Error": 0,
+      "Loan Payment Issue": 0,
+      "Loan Rate Query": 0,
+      "INVALID_LABEL": 0
+    },
+    "Card Security Concern": {
+      "Card Payment Dispute": 1,
+      "Card Charge Review": 0,
+      "Card Security Concern": 9,
+      "Account Access Issue": 0,
+      "Account Review Request": 0,
+      "Account Restriction Notice": 0,
+      "Transfer Processing Delay": 0,
+      "Transfer Detail Error": 0,
+      "Loan Payment Issue": 0,
+      "Loan Rate Query": 0,
+      "INVALID_LABEL": 0
+    },
+    "Account Access Issue": {
+      "Card Payment Dispute": 0,
+      "Card Charge Review": 0,
+      "Card Security Concern": 0,
+      "Account Access Issue": 10,
+      "Account Review Request": 0,
+      "Account Restriction Notice": 0,
+      "Transfer Processing Delay": 0,
+      "Transfer Detail Error": 0,
+      "Loan Payment Issue": 0,
+      "Loan Rate Query": 0,
+      "INVALID_LABEL": 0
+    },
+    "Account Review Request": {
+      "Card Payment Dispute": 0,
+      "Card Charge Review": 0,
+      "Card Security Concern": 0,
+      "Account Access Issue": 2,
+      "Account Review Request": 6,
+      "Account Restriction Notice": 2,
+      "Transfer Processing Delay": 0,
+      "Transfer Detail Error": 0,
+      "Loan Payment Issue": 0,
+      "Loan Rate Query": 0,
+      "INVALID_LABEL": 0
+    },
+    "Account Restriction Notice": {
+      "Card Payment Dispute": 0,
+      "Card Charge Review": 0,
+      "Card Security Concern": 0,
+      "Account Access Issue": 0,
+      "Account Review Request": 0,
+      "Account Restriction Notice": 8,
+      "Transfer Processing Delay": 2,
+      "Transfer Detail Error": 0,
+      "Loan Payment Issue": 0,
+      "Loan Rate Query": 0,
+      "INVALID_LABEL": 0
+    },
+    "Transfer Processing Delay": {
+      "Card Payment Dispute": 0,
+      "Card Charge Review": 0,
+      "Card Security Concern": 0,
+      "Account Access Issue": 0,
+      "Account Review Request": 0,
+      "Account Restriction Notice": 0,
+      "Transfer Processing Delay": 10,
+      "Transfer Detail Error": 0,
+      "Loan Payment Issue": 0,
+      "Loan Rate Query": 0,
+      "INVALID_LABEL": 0
+    },
+    "Transfer Detail Error": {
+      "Card Payment Dispute": 0,
+      "Card Charge Review": 0,
+      "Card Security Concern": 0,
+      "Account Access Issue": 0,
+      "Account Review Request": 0,
+      "Account Restriction Notice": 0,
+      "Transfer Processing Delay": 0,
+      "Transfer Detail Error": 10,
+      "Loan Payment Issue": 0,
+      "Loan Rate Query": 0,
+      "INVALID_LABEL": 0
+    },
+    "Loan Payment Issue": {
+      "Card Payment Dispute": 0,
+      "Card Charge Review": 0,
+      "Card Security Concern": 0,
+      "Account Access Issue": 0,
+      "Account Review Request": 0,
+      "Account Restriction Notice": 0,
+      "Transfer Processing Delay": 1,
+      "Transfer Detail Error": 0,
+      "Loan Payment Issue": 9,
+      "Loan Rate Query": 0,
+      "INVALID_LABEL": 0
+    },
+    "Loan Rate Query": {
+      "Card Payment Dispute": 0,
+      "Card Charge Review": 0,
+      "Card Security Concern": 0,
+      "Account Access Issue": 0,
+      "Account Review Request": 0,
+      "Account Restriction Notice": 0,
+      "Transfer Processing Delay": 0,
+      "Transfer Detail Error": 0,
+      "Loan Payment Issue": 1,
+      "Loan Rate Query": 9,
+      "INVALID_LABEL": 0
+    }
+  },
+  "error_cases": [
+    {
+      "sample_number": 96,
+      "complaint_text": "The KYC refresh requires company documents before I can make normal payments.",
+      "true_label": "Account Review Request",
+      "predicted_label": "Account Restriction Notice",
+      "confidence": 0.75,
+      "rationale": "KYC refresh requires company documents before I can make normal payments."
+    },
+    {
+      "sample_number": 100,
+      "complaint_text": "A debit freeze was applied after an overseas transfer and no release date is shown.",
+      "true_label": "Account Restriction Notice",
+      "predicted_label": "Transfer Processing Delay",
+      "confidence": 0.75,
+      "rationale": "Debit freeze applied after an overseas transfer and no release date shown."
+    },
+    {
+      "sample_number": 73,
+      "complaint_text": "A rental bond authorisation is pending even though the merchant released the car.",
+      "true_label": "Card Charge Review",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.72,
+      "rationale": "Rental bond authorisation pending despite merchant releasing the car (card payment hold)."
+    },
+    {
+      "sample_number": 97,
+      "complaint_text": "A duplicate hold from a food delivery app is reducing my card balance.",
+      "true_label": "Card Charge Review",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.68,
+      "rationale": "Duplicate authorization hold on card reducing balance from a food delivery app."
+    },
+    {
+      "sample_number": 35,
+      "complaint_text": "My card was charged through a saved wallet token after I removed the merchant.",
+      "true_label": "Card Security Concern",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.66,
+      "rationale": "Charge through a saved wallet token after I removed the merchant."
+    },
+    {
+      "sample_number": 45,
+      "complaint_text": "The airline has a pending authorisation and a posted fare for the same ticket.",
+      "true_label": "Card Charge Review",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.65,
+      "rationale": "The user reports a pending authorisation and a posted charge for the same ticket, indicating a dispute over the card payment."
+    },
+    {
+      "sample_number": 89,
+      "complaint_text": "The pending authorisation from a failed checkout has not dropped off my card.",
+      "true_label": "Card Charge Review",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.65,
+      "rationale": "Pending authorisation from a failed checkout has not dropped off my card."
+    },
+    {
+      "sample_number": 3,
+      "complaint_text": "The app is asking for a KYC refresh and source of funds before I can continue.",
+      "true_label": "Account Review Request",
+      "predicted_label": "Account Access Issue",
+      "confidence": 0.62,
+      "rationale": "App requires KYC refresh and source of funds before user can continue, indicating access restriction."
+    },
+    {
+      "sample_number": 27,
+      "complaint_text": "The car rental preauth reversal has not happened and my limit is still reduced.",
+      "true_label": "Card Charge Review",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.62,
+      "rationale": "The issue involves a car rental preauthorization (preauth) not reversing, affecting the card limit\u2014typical of a card payment-related dispute."
+    },
+    {
+      "sample_number": 48,
+      "complaint_text": "The discharge quote includes a break cost I was not expecting.",
+      "true_label": "Loan Rate Query",
+      "predicted_label": "Loan Payment Issue",
+      "confidence": 0.62,
+      "rationale": "The complaint mentions a break cost in a discharge quote, which is related to loan payoff/loan payment charges."
+    },
+    {
+      "sample_number": 17,
+      "complaint_text": "An AML block stopped my salary transfer and branch staff could not explain the hold.",
+      "true_label": "Account Restriction Notice",
+      "predicted_label": "Transfer Processing Delay",
+      "confidence": 0.58,
+      "rationale": "AML block stopped my salary transfer and branch staff could not explain the hold."
+    },
+    {
+      "sample_number": 71,
+      "complaint_text": "The bank says direct debit dishonour, but the nominated account had enough funds.",
+      "true_label": "Loan Payment Issue",
+      "predicted_label": "Transfer Processing Delay",
+      "confidence": 0.55,
+      "rationale": "Direct debit dishonour indicates a transfer failure; the complaint is about a direct debit being dishonoured despite funds available."
+    },
+    {
+      "sample_number": 8,
+      "complaint_text": "A duplicate hold from the petrol station is reducing my available balance.",
+      "true_label": "Card Charge Review",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.0,
+      "rationale": "mentions a duplicate card payment hold affecting available balance"
+    },
+    {
+      "sample_number": 38,
+      "complaint_text": "A hotel pending authorisation is showing alongside the settled room charge.",
+      "true_label": "Card Charge Review",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.0,
+      "rationale": "Pending authorisation shown alongside settled room charge indicates a dispute over a card payment."
+    },
+    {
+      "sample_number": 54,
+      "complaint_text": "I cannot finish onboarding because the KYC refresh keeps rejecting my licence.",
+      "true_label": "Account Review Request",
+      "predicted_label": "Account Access Issue",
+      "confidence": 0.0,
+      "rationale": "Onboarding cannot be completed because KYC refresh keeps rejecting the licence."
+    },
+    {
+      "sample_number": 58,
+      "complaint_text": "A preauth reversal from the supermarket delivery still has not released the funds.",
+      "true_label": "Card Charge Review",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.0,
+      "rationale": "Customer reports a card preauthorisation reversal not releasing funds from a supermarket payment."
+    },
+    {
+      "sample_number": 64,
+      "complaint_text": "The duplicate hold from an online grocery order is still pending after settlement.",
+      "true_label": "Card Charge Review",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.0,
+      "rationale": "Duplicate hold on a card payment (online grocery order) still pending after settlement."
+    },
+    {
+      "sample_number": 65,
+      "complaint_text": "Source of funds was requested for my redundancy payout before the account can reopen.",
+      "true_label": "Account Review Request",
+      "predicted_label": "Account Restriction Notice",
+      "confidence": 0.0,
+      "rationale": "Source of funds requested before the account can reopen, indicating account restriction"
+    }
+  ],
+  "error_analysis": {
+    "summary": "The main ambiguity lies in card-related prompts where authorization holds and pending charges are conflated with disputes, and in account/loan prompts where 'review' vs 'restriction' vs 'access' cues overlap. Additional confusion occurs between rate-related questions and payoff/charge issues in loans, and between payment failures and processing delays in transfers.",
+    "confusing_pairs": [
+      {
+        "true_label": "Card Charge Review",
+        "predicted_label": "Card Payment Dispute",
+        "likely_reason": "Prompts frequently mention authorization holds, pending authorisations, or preauthorisations for card transactions, which can be interpreted as a dispute rather than a review of a charge.",
+        "prompt_gap": "Specify whether the issue is an authorization/hold vs a settled charge to prevent conflating holds with a dispute."
+      },
+      {
+        "true_label": "Card Security Concern",
+        "predicted_label": "Card Payment Dispute",
+        "likely_reason": "Language around a charge occurring via a saved wallet token after merchant action can imply a security issue, but the same wording can be read as a disputed payment.",
+        "prompt_gap": "Distinguish clearly between security concerns (fraud/suspicious token usage) and a disputed charge; avoid using dispute-centric wording when the core issue is security."
+      },
+      {
+        "true_label": "Account Review Request",
+        "predicted_label": "Account Access Issue",
+        "likely_reason": "Onboarding/KYC-related prompts (e.g., refresh requests, source of funds) can be interpreted as access restrictions rather than a regulatory review of the account.",
+        "prompt_gap": "Differentiate explicitly between access restrictions and review/restriction due to regulatory checks; include explicit cues for review (KYC) vs access problems."
+      },
+      {
+        "true_label": "Account Review Request",
+        "predicted_label": "Account Restriction Notice",
+        "likely_reason": "Requests for sources of funds or KYC to reopen an account can be read as ongoing restrictions rather than a review process.",
+        "prompt_gap": "When discussing reopening or gating conditions, explicitly indicate whether the account is under review or restricted to avoid mislabeling as a restriction."
+      },
+      {
+        "true_label": "Loan Rate Query",
+        "predicted_label": "Loan Payment Issue",
+        "likely_reason": "Discharge quotes mentioning break costs or payoff-related details can be interpreted as payment issues rather than rate inquiries.",
+        "prompt_gap": "Clarify if the user is asking about interest rates/terms vs. payoff costs; include explicit rate-related language to steer to Loan Rate Query."
+      },
+      {
+        "true_label": "Loan Payment Issue",
+        "predicted_label": "Transfer Processing Delay",
+        "likely_reason": "Direct debit failures or payment problems can be perceived as processing delays in transfers, leading to misclassification.",
+        "prompt_gap": "Differentiate clearly between payment failures/direct debits and processing delays in transfers; use explicit terms like 'direct debit failed' vs 'transfer processing delay'."
+      },
+      {
+        "true_label": "Account Restriction Notice",
+        "predicted_label": "Transfer Processing Delay",
+        "likely_reason": "AML/compliance-related blocks on salary transfers can be described similarly to processing delays, causing mislabeling as delays.",
+        "prompt_gap": "Explicitly distinguish AML/compliance-restriction notices from generic transfer delays; mention 'AML block' or 'compliance hold' to cue the correct label."
+      }
+    ],
+    "improvement_principles": [
+      "Introduce clearer disambiguation cues in prompts: map specific terms (authorization hold, pending charge, preauthorization) to Card Charge Review or Card Payment Dispute with distinct language to reduce cross-label ambiguity.",
+      "Separate security/fraud language from dispute language: create distinct intents for Card Security Concern vs Card Payment Dispute to prevent misclassification.",
+      "Clarify account lifecycle states: distinguish between 'in review' (KYC/Source of Funds), 'restricted' (restrictions or holds), and 'access issue' (login/onboarding problems) with explicit cues.",
+      "Differentiate loan-related intents: separate rate/terms inquiries from payoff/charge issues by including explicit keywords for rates (e.g., rate, APR, break cost) vs payoff/charges (e.g., discharge quote, payoff amount).",
+      "Explicitly label transfer vs payment problems: include clear cues for direct debits, transfers, and processing delays, and tie AML/compliance context to restriction rather than delay.",
+      "Provide more diverse training examples that cover the edge cases observed (preauthorisations, holds, AML blocks, KYC rejections, and mixed scenarios) to reduce reliance on single keywords for classification.",
+      "Consider a hierarchical or multi-label approach for ambiguous cases: if the text contains overlapping cues (e.g., 'pending authorisation' and 'dispute'), defer to a secondary classifier or ask for clarification rather than forcing a single label."
+    ]
+  },
+  "change_summary": [
+    "Added explicit disambiguation cues to differentiate between authorization holds, disputes, and security concerns for card-related issues, reducing label confusion between Card Charge Review, Card Payment Dispute, and Card Security Concern.",
+    "Introduced explicit guidance to distinguish account lifecycle states (in\u2011review, restricted, and access issue) using cues like KYC, source of funds, AML blocks, and onboarding/login context.",
+    "Clarified transfer and payment classification rules, including AML/restriction context for transfers and distinguishing direct debit failures from processing delays.",
+    "Separated loan-related intents into rate/terms inquiries versus payoff/charges, guiding labels toward Loan Rate Query or Loan Payment Issue depending on keywords.",
+    "Emphasized preference for more specific labels when cues overlap, informed by the provided error cases, to improve discrimination without altering the required JSON output contract."
+  ],
+  "proposed_prompt": "You classify short retail banking complaints. Choose exactly one class label from the allowed list below. Return a JSON object with fields: class_label (one of the allowed labels), confidence (numeric), rationale (brief justification based only on the complaint text). Do not mention or rely on ground-truth labels or external information. The rationale should be a concise sentence or two that cites phrases from the complaint.\n\nDisambiguation guidance (based on error analysis and sampled error cases):\n- Card vs Charge vs Dispute vs Security:\n  \u2022 Look for mentions of authorization holds, pending authorisations, or preauthorisations. When there is a card hold or preauth without a settled charge, map to Card Charge Review. When there is a posted charge that is disputed, map to Card Payment Dispute. When the issue centers on fraud/suspicious usage around a card payment, map to Card Security Concern.\n- Account lifecycle:\n  \u2022 If the text mentions KYC, source of funds, onboarding steps, or requests to reopen an account, decide between Account Review Request (in\u2011review), Account Restriction Notice (AML/compliance hold), or Account Access Issue (login/onboarding problems) using explicit cues: mentions of KYC/review/opening -> Account Review Request; AML block/hold -> Account Restriction Notice; login/onboarding problems -> Account Access Issue.\n- Transfers/payments:\n  \u2022 AML/compliance restrictions on transfers -> Account Restriction Notice. Direct debit problems or transfer failures: decide based on whether the complaint describes a failure/dishonour vs a delay; use Transfer Processing Delay for delays, Transfer Detail Error for specific transfer details.\n- Loans:\n  \u2022 Distinguish rate/terms questions (rate, APR, break cost) from payoff/charge issues (discharge quote, payoff amount). Rate/terms -> Loan Rate Query; payoff/charges -> Loan Payment Issue.\n\nIf a case in the error analysis shows overlapping cues, prefer the more specific label as indicated above. Output a single JSON object with class_label from the allowed list, a numeric 0-1 confidence, and a rationale derived from the complaint text.",
+  "token_usage": {
+    "classification": {
+      "requests": 100,
+      "prompt_tokens": 18300,
+      "completion_tokens": 56202,
+      "total_tokens": 74502
+    },
+    "error_analysis": {
+      "requests": 1,
+      "prompt_tokens": 2867,
+      "completion_tokens": 5972,
+      "total_tokens": 8839
+    },
+    "prompt_improvement": {
+      "requests": 1,
+      "prompt_tokens": 2886,
+      "completion_tokens": 4609,
+      "total_tokens": 7495
+    },
+    "iteration_total": {
+      "requests": 102,
+      "prompt_tokens": 24053,
+      "completion_tokens": 66783,
+      "total_tokens": 90836
+    },
+    "run_total": {
+      "requests": 102,
+      "prompt_tokens": 24053,
+      "completion_tokens": 66783,
+      "total_tokens": 90836
+    }
+  },
+  "predictions": [
+    {
+      "sample_number": 1,
+      "complaint_text": "I sent rent to the wrong BSB and the branch says the beneficiary name does not match.",
+      "true_label": "Transfer Detail Error",
+      "predicted_label": "Transfer Detail Error",
+      "confidence": 0.72,
+      "rationale": "mentions wrong BSB and beneficiary name mismatch in a transfer"
+    },
+    {
+      "sample_number": 2,
+      "complaint_text": "My card was used online as card not present while it was still in my wallet.",
+      "true_label": "Card Security Concern",
+      "predicted_label": "Card Security Concern",
+      "confidence": 0.0,
+      "rationale": "Unauthorized online use of card despite it remaining in wallet; indicates card security concern."
+    },
+    {
+      "sample_number": 3,
+      "complaint_text": "The app is asking for a KYC refresh and source of funds before I can continue.",
+      "true_label": "Account Review Request",
+      "predicted_label": "Account Access Issue",
+      "confidence": 0.62,
+      "rationale": "App requires KYC refresh and source of funds before user can continue, indicating access restriction."
+    },
+    {
+      "sample_number": 4,
+      "complaint_text": "My home loan direct debit dishonoured even though salary arrived the same morning.",
+      "true_label": "Loan Payment Issue",
+      "predicted_label": "Loan Payment Issue",
+      "confidence": 0.82,
+      "rationale": "Direct debit loan payment for home loan dishonoured."
+    },
+    {
+      "sample_number": 5,
+      "complaint_text": "I need a chargeback because the hotel charged me after promising the booking was cancelled.",
+      "true_label": "Card Payment Dispute",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.75,
+      "rationale": "Complaint about being charged after booking cancellation and request for chargeback."
+    },
+    {
+      "sample_number": 6,
+      "complaint_text": "My Osko payment is still pending and the recipient has not received it after two hours.",
+      "true_label": "Transfer Processing Delay",
+      "predicted_label": "Transfer Processing Delay",
+      "confidence": 0.72,
+      "rationale": "Osko payment pending; recipient not received after two hours indicates a transfer processing delay."
+    },
+    {
+      "sample_number": 7,
+      "complaint_text": "I am stuck in biometric lockout after changing phones and cannot view my account.",
+      "true_label": "Account Access Issue",
+      "predicted_label": "Account Access Issue",
+      "confidence": 0.0,
+      "rationale": "Biometric lockout after changing phones prevents viewing account."
+    },
+    {
+      "sample_number": 8,
+      "complaint_text": "A duplicate hold from the petrol station is reducing my available balance.",
+      "true_label": "Card Charge Review",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.0,
+      "rationale": "mentions a duplicate card payment hold affecting available balance"
+    },
+    {
+      "sample_number": 9,
+      "complaint_text": "I want to know the break cost before ending my fixed rate early.",
+      "true_label": "Loan Rate Query",
+      "predicted_label": "Loan Rate Query",
+      "confidence": 0.62,
+      "rationale": "Customer asks about break cost for ending a fixed rate early."
+    },
+    {
+      "sample_number": 10,
+      "complaint_text": "My account has a debit freeze and I was not told why transfers are blocked.",
+      "true_label": "Account Restriction Notice",
+      "predicted_label": "Account Restriction Notice",
+      "confidence": 0.65,
+      "rationale": "Debit freeze and transfers blocked; user was not told why."
+    },
+    {
+      "sample_number": 11,
+      "complaint_text": "The restaurant preauthorisation is still pending days after the final bill cleared.",
+      "true_label": "Card Charge Review",
+      "predicted_label": "Card Charge Review",
+      "confidence": 0.0,
+      "rationale": "mentions a card preauthorization/charge status pending after final bill cleared"
+    },
+    {
+      "sample_number": 12,
+      "complaint_text": "I used the wrong BSB for my car payment and need help tracing the funds.",
+      "true_label": "Transfer Detail Error",
+      "predicted_label": "Transfer Detail Error",
+      "confidence": 0.0,
+      "rationale": "User used wrong BSB for a transfer and needs help tracing the funds."
+    },
+    {
+      "sample_number": 13,
+      "complaint_text": "The merchant descriptor is unfamiliar and I do not recognise this overseas subscription.",
+      "true_label": "Card Payment Dispute",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.0,
+      "rationale": "Unfamiliar merchant descriptor for an overseas subscription; user is disputing a card payment."
+    },
+    {
+      "sample_number": 14,
+      "complaint_text": "The one time passcode never arrives, so I cannot approve the new device login.",
+      "true_label": "Account Access Issue",
+      "predicted_label": "Account Access Issue",
+      "confidence": 0.0,
+      "rationale": "OTP/one-time passcode not arriving, preventing approval of new device login."
+    },
+    {
+      "sample_number": 15,
+      "complaint_text": "My fixed rate expiry letter shows a higher comparison rate than the website.",
+      "true_label": "Loan Rate Query",
+      "predicted_label": "Loan Rate Query",
+      "confidence": 0.72,
+      "rationale": "Complaint about fixed rate expiry letter showing a higher comparison rate than the website."
+    },
+    {
+      "sample_number": 16,
+      "complaint_text": "There are suspicious tap transactions from a suburb I did not visit.",
+      "true_label": "Card Security Concern",
+      "predicted_label": "Card Security Concern",
+      "confidence": 0.0,
+      "rationale": "Suspicious tap transactions from a suburb the customer did not visit."
+    },
+    {
+      "sample_number": 17,
+      "complaint_text": "An AML block stopped my salary transfer and branch staff could not explain the hold.",
+      "true_label": "Account Restriction Notice",
+      "predicted_label": "Transfer Processing Delay",
+      "confidence": 0.58,
+      "rationale": "AML block stopped my salary transfer and branch staff could not explain the hold."
+    },
+    {
+      "sample_number": 18,
+      "complaint_text": "I requested a repayment holiday but still received an arrears notice this week.",
+      "true_label": "Loan Payment Issue",
+      "predicted_label": "Loan Payment Issue",
+      "confidence": 0.0,
+      "rationale": "customer requested a loan repayment holiday but arrears notice issued"
+    },
+    {
+      "sample_number": 19,
+      "complaint_text": "The NPP timeout message appeared, but the money has still left my account.",
+      "true_label": "Transfer Processing Delay",
+      "predicted_label": "Transfer Processing Delay",
+      "confidence": 0.72,
+      "rationale": "NPP timeout message appeared, but money has left the account, indicating a transfer processing delay."
+    },
+    {
+      "sample_number": 20,
+      "complaint_text": "I uploaded documents for enhanced due diligence and the review is still open.",
+      "true_label": "Account Review Request",
+      "predicted_label": "Account Review Request",
+      "confidence": 0.0,
+      "rationale": "Complaint mentions enhanced due diligence documents and that the review is still open."
+    },
+    {
+      "sample_number": 21,
+      "complaint_text": "Please explain why the comparison rate changed after my package discount was removed.",
+      "true_label": "Loan Rate Query",
+      "predicted_label": "Loan Rate Query",
+      "confidence": 0.65,
+      "rationale": "Customer asks why the comparison rate changed after a package discount was removed."
+    },
+    {
+      "sample_number": 22,
+      "complaint_text": "My card works for balance checks, but the account hold blocks every outgoing payment.",
+      "true_label": "Account Restriction Notice",
+      "predicted_label": "Account Restriction Notice",
+      "confidence": 0.65,
+      "rationale": "Complaint mentions an account hold blocking outgoing payments."
+    },
+    {
+      "sample_number": 23,
+      "complaint_text": "The payment missed the cut off time even though I submitted it before lunch.",
+      "true_label": "Transfer Processing Delay",
+      "predicted_label": "Transfer Processing Delay",
+      "confidence": 0.0,
+      "rationale": "Payment missed the cut off time; relates to transfer processing delay."
+    },
+    {
+      "sample_number": 24,
+      "complaint_text": "A tokenised wallet was added to my card and I did not authorise the device.",
+      "true_label": "Card Security Concern",
+      "predicted_label": "Card Security Concern",
+      "confidence": 0.65,
+      "rationale": "Unauthorized tokenised wallet added to card; indicates a security concern."
+    },
+    {
+      "sample_number": 25,
+      "complaint_text": "Device binding fails every time I reinstall the banking app on my phone.",
+      "true_label": "Account Access Issue",
+      "predicted_label": "Account Access Issue",
+      "confidence": 0.0,
+      "rationale": "Device binding fails every time I reinstall the banking app on my phone."
+    },
+    {
+      "sample_number": 26,
+      "complaint_text": "My PayID mismatch warning was ignored and the transfer went to the wrong person.",
+      "true_label": "Transfer Detail Error",
+      "predicted_label": "Transfer Detail Error",
+      "confidence": 0.72,
+      "rationale": "PayID mismatch warning ignored; transfer went to the wrong person."
+    },
+    {
+      "sample_number": 27,
+      "complaint_text": "The car rental preauth reversal has not happened and my limit is still reduced.",
+      "true_label": "Card Charge Review",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.62,
+      "rationale": "The issue involves a car rental preauthorization (preauth) not reversing, affecting the card limit\u2014typical of a card payment-related dispute."
+    },
+    {
+      "sample_number": 28,
+      "complaint_text": "The bank asked for source of funds for a savings deposit from my parents.",
+      "true_label": "Account Review Request",
+      "predicted_label": "Account Review Request",
+      "confidence": 0.0,
+      "rationale": "Bank asked for source of funds for a savings deposit."
+    },
+    {
+      "sample_number": 29,
+      "complaint_text": "I was promised provisional credit while the card dispute is investigated.",
+      "true_label": "Card Payment Dispute",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.72,
+      "rationale": "Provisional credit promised during a card dispute investigation."
+    },
+    {
+      "sample_number": 30,
+      "complaint_text": "The arrears notice is wrong because the repayment was taken by direct debit.",
+      "true_label": "Loan Payment Issue",
+      "predicted_label": "Loan Payment Issue",
+      "confidence": 0.0,
+      "rationale": "Arrears notice is wrong because the repayment was taken by direct debit."
+    },
+    {
+      "sample_number": 31,
+      "complaint_text": "My business profile is stuck on KYC refresh after I changed trading address.",
+      "true_label": "Account Review Request",
+      "predicted_label": "Account Review Request",
+      "confidence": 0.0,
+      "rationale": "KYC refresh after changing trading address."
+    },
+    {
+      "sample_number": 32,
+      "complaint_text": "The merchant took payment twice and refuses to refund the duplicate order.",
+      "true_label": "Card Payment Dispute",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.72,
+      "rationale": "Duplicate card charge for the same order and request for refund."
+    },
+    {
+      "sample_number": 33,
+      "complaint_text": "I made an extra repayment, but the system still says the loan is in arrears.",
+      "true_label": "Loan Payment Issue",
+      "predicted_label": "Loan Payment Issue",
+      "confidence": 0.0,
+      "rationale": "Extra repayment not reflected; system shows loan in arrears."
+    },
+    {
+      "sample_number": 34,
+      "complaint_text": "The beneficiary name was misspelled and the supplier says the funds never arrived.",
+      "true_label": "Transfer Detail Error",
+      "predicted_label": "Transfer Detail Error",
+      "confidence": 0.0,
+      "rationale": "Misspelled beneficiary name indicating an error in transfer details."
+    },
+    {
+      "sample_number": 35,
+      "complaint_text": "My card was charged through a saved wallet token after I removed the merchant.",
+      "true_label": "Card Security Concern",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.66,
+      "rationale": "Charge through a saved wallet token after I removed the merchant."
+    },
+    {
+      "sample_number": 36,
+      "complaint_text": "I need the current fixed rate expiry options before deciding whether to refix.",
+      "true_label": "Loan Rate Query",
+      "predicted_label": "Loan Rate Query",
+      "confidence": 0.0,
+      "rationale": "Customer asks about current fixed-rate expiry options before deciding to refix."
+    },
+    {
+      "sample_number": 37,
+      "complaint_text": "The online message says AML block and my direct debits are being rejected.",
+      "true_label": "Account Restriction Notice",
+      "predicted_label": "Account Restriction Notice",
+      "confidence": 0.62,
+      "rationale": "AML block and direct debits are being rejected"
+    },
+    {
+      "sample_number": 38,
+      "complaint_text": "A hotel pending authorisation is showing alongside the settled room charge.",
+      "true_label": "Card Charge Review",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.0,
+      "rationale": "Pending authorisation shown alongside settled room charge indicates a dispute over a card payment."
+    },
+    {
+      "sample_number": 39,
+      "complaint_text": "I reset my password, but the one time passcode screen loops back to sign in.",
+      "true_label": "Account Access Issue",
+      "predicted_label": "Account Access Issue",
+      "confidence": 0.68,
+      "rationale": "Password reset with OTP looping back to sign-in indicates login/access problem"
+    },
+    {
+      "sample_number": 40,
+      "complaint_text": "The instant transfer showed NPP timeout and support cannot tell me when it will post.",
+      "true_label": "Transfer Processing Delay",
+      "predicted_label": "Transfer Processing Delay",
+      "confidence": 0.0,
+      "rationale": "The complaint describes an instant transfer timeout (NPP) and uncertainty about posting time."
+    },
+    {
+      "sample_number": 41,
+      "complaint_text": "There is an account hold after a large cash deposit and I cannot pay bills.",
+      "true_label": "Account Restriction Notice",
+      "predicted_label": "Account Restriction Notice",
+      "confidence": 0.78,
+      "rationale": "Customer reports an account hold after a large cash deposit, preventing bill payments."
+    },
+    {
+      "sample_number": 42,
+      "complaint_text": "The repayment holiday confirmation came through, but the loan debit was still taken.",
+      "true_label": "Loan Payment Issue",
+      "predicted_label": "Loan Payment Issue",
+      "confidence": 0.78,
+      "rationale": "Repayment holiday confirmed but the loan debit was still taken, indicating a loan payment issue."
+    },
+    {
+      "sample_number": 43,
+      "complaint_text": "Face ID stopped working and biometric lockout will not let me use my PIN.",
+      "true_label": "Account Access Issue",
+      "predicted_label": "Account Access Issue",
+      "confidence": 0.0,
+      "rationale": "Biometric (Face ID) login and PIN lockout prevent access to the account."
+    },
+    {
+      "sample_number": 44,
+      "complaint_text": "My payroll transfer is delayed after the cut off time rule was applied incorrectly.",
+      "true_label": "Transfer Processing Delay",
+      "predicted_label": "Transfer Processing Delay",
+      "confidence": 0.75,
+      "rationale": "Payroll transfer delayed due to cutoff time rule applied incorrectly."
+    },
+    {
+      "sample_number": 45,
+      "complaint_text": "The airline has a pending authorisation and a posted fare for the same ticket.",
+      "true_label": "Card Charge Review",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.65,
+      "rationale": "The user reports a pending authorisation and a posted charge for the same ticket, indicating a dispute over the card payment."
+    },
+    {
+      "sample_number": 46,
+      "complaint_text": "I ordered goods online, the store closed, and I need chargeback support.",
+      "true_label": "Card Payment Dispute",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.72,
+      "rationale": "Customer seeks chargeback support for online purchase where store closed."
+    },
+    {
+      "sample_number": 47,
+      "complaint_text": "Enhanced due diligence is requested for my trust account and no deadline is shown.",
+      "true_label": "Account Review Request",
+      "predicted_label": "Account Review Request",
+      "confidence": 0.0,
+      "rationale": "Enhanced due diligence requested for trust account; relates to account review."
+    },
+    {
+      "sample_number": 48,
+      "complaint_text": "The discharge quote includes a break cost I was not expecting.",
+      "true_label": "Loan Rate Query",
+      "predicted_label": "Loan Payment Issue",
+      "confidence": 0.62,
+      "rationale": "The complaint mentions a break cost in a discharge quote, which is related to loan payoff/loan payment charges."
+    },
+    {
+      "sample_number": 49,
+      "complaint_text": "I typed the wrong BSB for a tax payment and need the recall process started.",
+      "true_label": "Transfer Detail Error",
+      "predicted_label": "Transfer Detail Error",
+      "confidence": 0.65,
+      "rationale": "Typed the wrong BSB for a tax payment, requesting recall."
+    },
+    {
+      "sample_number": 50,
+      "complaint_text": "The fraud alert says card not present, but I never shop with that merchant.",
+      "true_label": "Card Security Concern",
+      "predicted_label": "Card Security Concern",
+      "confidence": 0.0,
+      "rationale": "Fraud alert about a card-not-present charge from an unrecognized merchant."
+    },
+    {
+      "sample_number": 51,
+      "complaint_text": "Several suspicious tap payments appeared after I lost my physical card.",
+      "true_label": "Card Security Concern",
+      "predicted_label": "Card Security Concern",
+      "confidence": 0.0,
+      "rationale": "suspicious tap payments appeared after I lost my physical card"
+    },
+    {
+      "sample_number": 52,
+      "complaint_text": "The banking app says device binding failed after I restored my phone backup.",
+      "true_label": "Account Access Issue",
+      "predicted_label": "Account Access Issue",
+      "confidence": 0.0,
+      "rationale": "Device binding failed in banking app after restoring phone backup."
+    },
+    {
+      "sample_number": 53,
+      "complaint_text": "The merchant descriptor says a gym membership I cancelled three months ago.",
+      "true_label": "Card Payment Dispute",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.72,
+      "rationale": "The complaint concerns a card charge for a gym membership that was cancelled."
+    },
+    {
+      "sample_number": 54,
+      "complaint_text": "I cannot finish onboarding because the KYC refresh keeps rejecting my licence.",
+      "true_label": "Account Review Request",
+      "predicted_label": "Account Access Issue",
+      "confidence": 0.0,
+      "rationale": "Onboarding cannot be completed because KYC refresh keeps rejecting the licence."
+    },
+    {
+      "sample_number": 55,
+      "complaint_text": "The PayID mismatch should have stopped the payment before it left my account.",
+      "true_label": "Transfer Detail Error",
+      "predicted_label": "Transfer Detail Error",
+      "confidence": 0.0,
+      "rationale": "PayID mismatch indicates an error in transfer details that should have prevented the payment."
+    },
+    {
+      "sample_number": 56,
+      "complaint_text": "My Osko pending transfer has been sitting overnight with no receipt number.",
+      "true_label": "Transfer Processing Delay",
+      "predicted_label": "Transfer Processing Delay",
+      "confidence": 0.68,
+      "rationale": "Osko pending transfer delayed overnight with no receipt number mentioned."
+    },
+    {
+      "sample_number": 57,
+      "complaint_text": "The direct debit dishonour fee was charged after the bank took the repayment late.",
+      "true_label": "Loan Payment Issue",
+      "predicted_label": "Loan Payment Issue",
+      "confidence": 0.74,
+      "rationale": "Complaint about direct debit dishonour fee after late repayment on loan payments."
+    },
+    {
+      "sample_number": 58,
+      "complaint_text": "A preauth reversal from the supermarket delivery still has not released the funds.",
+      "true_label": "Card Charge Review",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.0,
+      "rationale": "Customer reports a card preauthorisation reversal not releasing funds from a supermarket payment."
+    },
+    {
+      "sample_number": 59,
+      "complaint_text": "I received an account hold notice after sending money to my own brokerage account.",
+      "true_label": "Account Restriction Notice",
+      "predicted_label": "Account Restriction Notice",
+      "confidence": 0.65,
+      "rationale": "complaint mentions an account hold notice, indicating an account restriction"
+    },
+    {
+      "sample_number": 60,
+      "complaint_text": "I am comparing refinance offers and need the loan comparison rate explained.",
+      "true_label": "Loan Rate Query",
+      "predicted_label": "Loan Rate Query",
+      "confidence": 0.0,
+      "rationale": "Customer is comparing refinance offers and asks for explanation of the loan comparison rate."
+    },
+    {
+      "sample_number": 61,
+      "complaint_text": "The app says processing delay for an NPP payment that should have been instant.",
+      "true_label": "Transfer Processing Delay",
+      "predicted_label": "Transfer Processing Delay",
+      "confidence": 0.72,
+      "rationale": "The complaint cites a processing delay for an NPP payment that should have been instant."
+    },
+    {
+      "sample_number": 62,
+      "complaint_text": "My fixed rate expiry notice does not match the rate quoted by the branch.",
+      "true_label": "Loan Rate Query",
+      "predicted_label": "Loan Rate Query",
+      "confidence": 0.72,
+      "rationale": "Complaint about fixed rate expiry notice not matching the branch-quoted rate, indicating a loan rate discrepancy."
+    },
+    {
+      "sample_number": 63,
+      "complaint_text": "The debit freeze means my scheduled rent payment failed without warning.",
+      "true_label": "Account Restriction Notice",
+      "predicted_label": "Account Restriction Notice",
+      "confidence": 0.65,
+      "rationale": "Debit freeze caused a scheduled rent payment to fail without warning."
+    },
+    {
+      "sample_number": 64,
+      "complaint_text": "The duplicate hold from an online grocery order is still pending after settlement.",
+      "true_label": "Card Charge Review",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.0,
+      "rationale": "Duplicate hold on a card payment (online grocery order) still pending after settlement."
+    },
+    {
+      "sample_number": 65,
+      "complaint_text": "Source of funds was requested for my redundancy payout before the account can reopen.",
+      "true_label": "Account Review Request",
+      "predicted_label": "Account Restriction Notice",
+      "confidence": 0.0,
+      "rationale": "Source of funds requested before the account can reopen, indicating account restriction"
+    },
+    {
+      "sample_number": 66,
+      "complaint_text": "Someone added my card to a tokenised wallet and made rideshare purchases.",
+      "true_label": "Card Security Concern",
+      "predicted_label": "Card Security Concern",
+      "confidence": 0.0,
+      "rationale": "Unauthorized use via tokenised wallet leading to rideshare purchases"
+    },
+    {
+      "sample_number": 67,
+      "complaint_text": "The cruise operator cancelled the trip and I want a card dispute raised.",
+      "true_label": "Card Payment Dispute",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.85,
+      "rationale": "customer wants to raise a dispute over a card charge for a cruise trip"
+    },
+    {
+      "sample_number": 68,
+      "complaint_text": "My partial repayment was not allocated and the arrears notice increased.",
+      "true_label": "Loan Payment Issue",
+      "predicted_label": "Loan Payment Issue",
+      "confidence": 0.75,
+      "rationale": "Partial loan repayment not allocated; arrears notice increased."
+    },
+    {
+      "sample_number": 69,
+      "complaint_text": "The one time passcode goes to my old number and I cannot update it online.",
+      "true_label": "Account Access Issue",
+      "predicted_label": "Account Access Issue",
+      "confidence": 0.0,
+      "rationale": "OTP is sent to the old number and cannot be updated online, hindering access to the account."
+    },
+    {
+      "sample_number": 70,
+      "complaint_text": "I selected the wrong saved beneficiary and need the transfer recalled urgently.",
+      "true_label": "Transfer Detail Error",
+      "predicted_label": "Transfer Detail Error",
+      "confidence": 0.65,
+      "rationale": "User selected the wrong saved beneficiary and wants the transfer recalled; indicates an error in transfer details."
+    },
+    {
+      "sample_number": 71,
+      "complaint_text": "The bank says direct debit dishonour, but the nominated account had enough funds.",
+      "true_label": "Loan Payment Issue",
+      "predicted_label": "Transfer Processing Delay",
+      "confidence": 0.55,
+      "rationale": "Direct debit dishonour indicates a transfer failure; the complaint is about a direct debit being dishonoured despite funds available."
+    },
+    {
+      "sample_number": 72,
+      "complaint_text": "My statement shows card not present transactions after a phishing message.",
+      "true_label": "Card Security Concern",
+      "predicted_label": "Card Security Concern",
+      "confidence": 0.0,
+      "rationale": "Complaint mentions card-not-present transactions after a phishing message, indicating a security concern."
+    },
+    {
+      "sample_number": 73,
+      "complaint_text": "A rental bond authorisation is pending even though the merchant released the car.",
+      "true_label": "Card Charge Review",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.72,
+      "rationale": "Rental bond authorisation pending despite merchant releasing the car (card payment hold)."
+    },
+    {
+      "sample_number": 74,
+      "complaint_text": "The account hold blocked outgoing BPAY while incoming deposits still appear.",
+      "true_label": "Account Restriction Notice",
+      "predicted_label": "Account Restriction Notice",
+      "confidence": 0.0,
+      "rationale": "Complaint about an account hold blocking outgoing BPAY payments."
+    },
+    {
+      "sample_number": 75,
+      "complaint_text": "The bank transfer stayed pending because it was submitted after cut off time.",
+      "true_label": "Transfer Processing Delay",
+      "predicted_label": "Transfer Processing Delay",
+      "confidence": 0.85,
+      "rationale": "The complaint indicates a bank transfer remained pending due to cutoff time."
+    },
+    {
+      "sample_number": 76,
+      "complaint_text": "I cannot approve payments because device binding is stuck on the verification screen.",
+      "true_label": "Account Access Issue",
+      "predicted_label": "Account Access Issue",
+      "confidence": 0.62,
+      "rationale": "Device binding verification screen prevents approving payments (account access/verification issue)."
+    },
+    {
+      "sample_number": 77,
+      "complaint_text": "Please confirm whether a break cost applies if I sell before fixed rate expiry.",
+      "true_label": "Loan Rate Query",
+      "predicted_label": "Loan Rate Query",
+      "confidence": 0.0,
+      "rationale": "Query about whether a break cost applies if selling before fixed rate expiry"
+    },
+    {
+      "sample_number": 78,
+      "complaint_text": "Enhanced due diligence questions appeared after I received a foreign inheritance.",
+      "true_label": "Account Review Request",
+      "predicted_label": "Account Review Request",
+      "confidence": 0.0,
+      "rationale": "Enhanced due diligence questions after a foreign inheritance indicate an account review/request."
+    },
+    {
+      "sample_number": 79,
+      "complaint_text": "The recipient says the beneficiary name differs from their account and funds bounced.",
+      "true_label": "Transfer Detail Error",
+      "predicted_label": "Transfer Detail Error",
+      "confidence": 0.0,
+      "rationale": "The complaint mentions beneficiary name mismatch and funds bounced during transfer."
+    },
+    {
+      "sample_number": 80,
+      "complaint_text": "I need provisional credit because the disputed travel charge is due on my statement.",
+      "true_label": "Card Payment Dispute",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.0,
+      "rationale": "Disputed travel charge on statement and request for provisional credit."
+    },
+    {
+      "sample_number": 81,
+      "complaint_text": "The merchant descriptor is vague and the amount matches no purchase I made.",
+      "true_label": "Card Payment Dispute",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.82,
+      "rationale": "Unrecognized card payment; descriptor vague and amount matches no purchase."
+    },
+    {
+      "sample_number": 82,
+      "complaint_text": "The Osko pending status disappeared but the recipient still cannot see the money.",
+      "true_label": "Transfer Processing Delay",
+      "predicted_label": "Transfer Processing Delay",
+      "confidence": 0.68,
+      "rationale": "Osko pending status disappeared; recipient cannot see money."
+    },
+    {
+      "sample_number": 83,
+      "complaint_text": "The source of funds request asks for payslips already submitted last month.",
+      "true_label": "Account Review Request",
+      "predicted_label": "Account Review Request",
+      "confidence": 0.65,
+      "rationale": "Complaint about a 'source of funds' request for payslips, indicating an account review request."
+    },
+    {
+      "sample_number": 84,
+      "complaint_text": "My offset package shows a different comparison rate from the mortgage contract.",
+      "true_label": "Loan Rate Query",
+      "predicted_label": "Loan Rate Query",
+      "confidence": 0.72,
+      "rationale": "Offset package shows a different comparison rate from the mortgage contract; related to loan rate inquiry."
+    },
+    {
+      "sample_number": 85,
+      "complaint_text": "I entered one digit wrong in the BSB and the payment went to another bank.",
+      "true_label": "Transfer Detail Error",
+      "predicted_label": "Transfer Detail Error",
+      "confidence": 0.0,
+      "rationale": "Payment sent to wrong bank due to an incorrect BSB, a transfer detail error."
+    },
+    {
+      "sample_number": 86,
+      "complaint_text": "The branch mentioned AML block, then my debit card and transfers stopped working.",
+      "true_label": "Account Restriction Notice",
+      "predicted_label": "Account Restriction Notice",
+      "confidence": 0.0,
+      "rationale": "Branch mentioned AML block causing debit card and transfers to stop (account restriction)."
+    },
+    {
+      "sample_number": 87,
+      "complaint_text": "A repayment holiday was approved but collections still called about missed payments.",
+      "true_label": "Loan Payment Issue",
+      "predicted_label": "Loan Payment Issue",
+      "confidence": 0.0,
+      "rationale": "mentions repayment holiday and collections about missed payments on a loan"
+    },
+    {
+      "sample_number": 88,
+      "complaint_text": "There was a suspicious tap at a train station after I reported the card missing.",
+      "true_label": "Card Security Concern",
+      "predicted_label": "Card Security Concern",
+      "confidence": 0.0,
+      "rationale": "mentions suspicious tap on a card after reporting it missing, indicating security concern."
+    },
+    {
+      "sample_number": 89,
+      "complaint_text": "The pending authorisation from a failed checkout has not dropped off my card.",
+      "true_label": "Card Charge Review",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.65,
+      "rationale": "Pending authorisation from a failed checkout has not dropped off my card."
+    },
+    {
+      "sample_number": 90,
+      "complaint_text": "Biometric lockout keeps appearing even after I verified my identity in branch.",
+      "true_label": "Account Access Issue",
+      "predicted_label": "Account Access Issue",
+      "confidence": 0.0,
+      "rationale": "Biometric lockout after identity verification indicates an account access issue."
+    },
+    {
+      "sample_number": 91,
+      "complaint_text": "I changed phones and the app will not complete device binding for mobile banking.",
+      "true_label": "Account Access Issue",
+      "predicted_label": "Account Access Issue",
+      "confidence": 0.0,
+      "rationale": "device binding issue preventing access to mobile banking"
+    },
+    {
+      "sample_number": 92,
+      "complaint_text": "I was billed for a free trial and want the chargeback form opened.",
+      "true_label": "Card Payment Dispute",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.75,
+      "rationale": "Customer was billed for a free trial and wants to open a chargeback form."
+    },
+    {
+      "sample_number": 93,
+      "complaint_text": "The PayID mismatch showed an old business name and I sent the invoice payment anyway.",
+      "true_label": "Transfer Detail Error",
+      "predicted_label": "Transfer Detail Error",
+      "confidence": 0.0,
+      "rationale": "PayID mismatch and old business name suggest a transfer detail error."
+    },
+    {
+      "sample_number": 94,
+      "complaint_text": "My loan repayment was split incorrectly and only part of it reduced the arrears.",
+      "true_label": "Loan Payment Issue",
+      "predicted_label": "Loan Payment Issue",
+      "confidence": 0.0,
+      "rationale": "Complaint about loan repayment being split incorrectly and only partial arrears reduction."
+    },
+    {
+      "sample_number": 95,
+      "complaint_text": "A new tokenised wallet appears in card controls and I do not own that device.",
+      "true_label": "Card Security Concern",
+      "predicted_label": "Card Security Concern",
+      "confidence": 0.0,
+      "rationale": "Unauthorized tokenised wallet appearing in card controls indicates a security concern related to card controls."
+    },
+    {
+      "sample_number": 96,
+      "complaint_text": "The KYC refresh requires company documents before I can make normal payments.",
+      "true_label": "Account Review Request",
+      "predicted_label": "Account Restriction Notice",
+      "confidence": 0.75,
+      "rationale": "KYC refresh requires company documents before I can make normal payments."
+    },
+    {
+      "sample_number": 97,
+      "complaint_text": "A duplicate hold from a food delivery app is reducing my card balance.",
+      "true_label": "Card Charge Review",
+      "predicted_label": "Card Payment Dispute",
+      "confidence": 0.68,
+      "rationale": "Duplicate authorization hold on card reducing balance from a food delivery app."
+    },
+    {
+      "sample_number": 98,
+      "complaint_text": "The NPP timeout caused my urgent supplier transfer to remain pending all afternoon.",
+      "true_label": "Transfer Processing Delay",
+      "predicted_label": "Transfer Processing Delay",
+      "confidence": 0.82,
+      "rationale": "NPP timeout caused urgent supplier transfer to remain pending."
+    },
+    {
+      "sample_number": 99,
+      "complaint_text": "I need the fixed rate expiry date and comparison rate before switching products.",
+      "true_label": "Loan Rate Query",
+      "predicted_label": "Loan Rate Query",
+      "confidence": 0.0,
+      "rationale": "customer asks about fixed rate expiry date and comparison rate before switching loan products"
+    },
+    {
+      "sample_number": 100,
+      "complaint_text": "A debit freeze was applied after an overseas transfer and no release date is shown.",
+      "true_label": "Account Restriction Notice",
+      "predicted_label": "Transfer Processing Delay",
+      "confidence": 0.75,
+      "rationale": "Debit freeze applied after an overseas transfer and no release date shown."
+    }
+  ]
+}
