@@ -1,0 +1,101 @@
+"""Pydantic schemas for LLM JSON contracts."""
+
+from __future__ import annotations
+
+from typing import Any
+
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
+
+
+class ClassificationOutput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    class_label: str = Field(description="Exactly one label from the allowed list.")
+    confidence: float = Field(ge=0.0, le=1.0)
+    rationale: str
+
+
+class ConfusingPair(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    true_label: str
+    predicted_label: str
+    likely_reason: str
+    prompt_gap: str
+
+
+class ErrorAnalysisOutput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    summary: str
+    confusing_pairs: list[ConfusingPair]
+    improvement_principles: list[str]
+
+
+class PromptImprovementOutput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    proposed_prompt: str
+    change_summary: list[str]
+
+    @field_validator("proposed_prompt")
+    @classmethod
+    def proposed_prompt_must_not_be_empty(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("proposed_prompt must not be empty")
+        return value
+
+
+def classification_response_schema(class_labels: list[str]) -> dict[str, Any]:
+    schema = ClassificationOutput.model_json_schema()
+    schema["properties"]["class_label"]["enum"] = class_labels
+    return _openai_strict_schema(schema)
+
+
+def error_analysis_response_schema() -> dict[str, Any]:
+    return _openai_strict_schema(ErrorAnalysisOutput.model_json_schema())
+
+
+def prompt_improvement_response_schema() -> dict[str, Any]:
+    return _openai_strict_schema(PromptImprovementOutput.model_json_schema())
+
+
+def validate_classification_output(
+    result: dict[str, Any],
+    class_labels: list[str],
+) -> ClassificationOutput:
+    output = ClassificationOutput.model_validate(result)
+    if output.class_label not in class_labels:
+        raise ValueError(
+            f"Model returned class_label {output.class_label!r}, "
+            "which is not in the allowed class labels."
+        )
+    return output
+
+
+def validate_error_analysis_output(result: dict[str, Any]) -> dict[str, Any]:
+    return _model_dump(ErrorAnalysisOutput.model_validate(result))
+
+
+def validate_prompt_improvement_output(result: dict[str, Any]) -> dict[str, Any]:
+    return _model_dump(PromptImprovementOutput.model_validate(result))
+
+
+def validation_error_message(exc: ValidationError | ValueError) -> str:
+    return f"Model output did not match the expected JSON contract: {exc}"
+
+
+def _model_dump(model: BaseModel) -> dict[str, Any]:
+    return model.model_dump()
+
+
+def _openai_strict_schema(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {
+            key: _openai_strict_schema(item)
+            for key, item in value.items()
+            if key not in {"default", "description", "maximum", "minimum", "title"}
+        }
+    if isinstance(value, list):
+        return [_openai_strict_schema(item) for item in value]
+    return value

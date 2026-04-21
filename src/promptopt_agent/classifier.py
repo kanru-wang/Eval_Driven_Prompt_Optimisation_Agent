@@ -8,6 +8,11 @@ from typing import Callable
 from promptopt_agent.data_loader import ComplaintSample
 from promptopt_agent.llm import OpenAIJSONClient
 from promptopt_agent.prompts import classification_user_prompt
+from promptopt_agent.schemas import (
+    classification_response_schema,
+    validate_classification_output,
+    validation_error_message,
+)
 
 
 @dataclass(frozen=True)
@@ -38,17 +43,20 @@ class LLMComplaintClassifier:
                 class_labels=self._class_labels,
                 complaint_text=sample.complaint_text,
             ),
+            response_schema=classification_response_schema(self._class_labels),
+            schema_name="complaint_classification",
         )
-        predicted_label = str(result.get("class_label", "")).strip()
-        if predicted_label not in self._class_labels:
-            predicted_label = "INVALID_LABEL"
+        try:
+            output = validate_classification_output(result, self._class_labels)
+        except ValueError as exc:
+            raise ValueError(validation_error_message(exc)) from exc
 
         return Prediction(
             sample_number=sample.sample_number,
             complaint_text=sample.complaint_text,
-            predicted_label=predicted_label,
-            confidence=float(result.get("confidence", 0.0)),
-            rationale=str(result.get("rationale", "")),
+            predicted_label=output.class_label,
+            confidence=output.confidence,
+            rationale=output.rationale,
             true_label=sample.class_label,
         )
 

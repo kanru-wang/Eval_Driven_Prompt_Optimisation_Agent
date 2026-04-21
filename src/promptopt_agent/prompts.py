@@ -8,7 +8,12 @@ import json
 DEFAULT_CLASSIFICATION_PROMPT = """You classify short retail banking complaints.
 
 Choose exactly one class label from the allowed list. The labels are short and
-some are intentionally similar, so rely on the customer's complaint wording.
+may overlap, so rely on the customer's complaint wording.
+
+Confidence rubric:
+- 0.80-1.00: clear wording points to one label.
+- 0.50-0.79: the best label is likely, but the complaint has limited detail or overlapping cues.
+- 0.00-0.49: the complaint is ambiguous, missing details, or fit multiple labels.
 
 Return JSON only with this shape:
 {
@@ -42,12 +47,11 @@ PROMPT_IMPROVEMENT_PROMPT = """You improve a text-classification prompt.
 
 Write a revised prompt that keeps the same JSON output contract and allowed
 label set. Make the prompt more discriminative using only the error analysis
-and sampled error cases provided. Do not mention ground-truth labels inside the
-final classification instructions except as class names in the allowed list.
+and sampled error cases provided.
 
 Return JSON only:
 {
-  "revised_prompt": "...",
+  "proposed_prompt": "...",
   "change_summary": ["...", "..."]
 }
 """

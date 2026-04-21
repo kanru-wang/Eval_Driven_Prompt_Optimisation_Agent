@@ -83,7 +83,7 @@ class PromptOptimisationAgent:
         )
         improvement_usage = self._llm.usage - improvement_start_usage
 
-        proposed_prompt = str(improvement.get("revised_prompt", self._prompt))
+        proposed_prompt = str(improvement.get("proposed_prompt", self._prompt))
         change_summary = [
             str(item) for item in improvement.get("change_summary", [])
         ]
@@ -108,5 +108,5 @@ class PromptOptimisationAgent:
             },
         )
 
-    def accept_prompt(self, revised_prompt: str) -> None:
-        self._prompt = revised_prompt
+    def accept_prompt(self, proposed_prompt: str) -> None:
+        self._prompt = proposed_prompt

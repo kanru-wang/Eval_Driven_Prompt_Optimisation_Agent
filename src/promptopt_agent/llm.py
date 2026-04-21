@@ -48,10 +48,24 @@ class OpenAIJSONClient:
         user_prompt: str,
         *,
         temperature: float | None = None,
+        response_schema: dict[str, Any] | None = None,
+        schema_name: str = "llm_response",
     ) -> dict[str, Any]:
+        response_format: dict[str, Any]
+        if response_schema is None:
+            response_format = {"type": "json_object"}
+        else:
+            response_format = {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": schema_name,
+                    "strict": True,
+                    "schema": response_schema,
+                },
+            }
         request = dict(
             model=self._model,
-            response_format={"type": "json_object"},
+            response_format=response_format,
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt},
