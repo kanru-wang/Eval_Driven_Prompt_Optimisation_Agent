@@ -11,14 +11,14 @@ Choose exactly one class label from the allowed list. The labels are short and
 may overlap, so rely on the customer's complaint wording.
 
 Confidence rubric:
-- 0.80-1.00: clear wording points to one label.
-- 0.50-0.79: the best label is likely, but the complaint has limited detail or overlapping cues.
-- 0.00-0.49: the complaint is ambiguous, missing details, or fit multiple labels.
+- 9-10: clear wording points to one label.
+- 5-8: the best label is likely, but the complaint has limited detail or overlapping cues.
+- 1-4: the complaint is ambiguous, missing details, or could fit multiple labels.
 
 Return JSON only with this shape:
 {
   "class_label": "one allowed class label",
-  "confidence": 0.0,
+  "confidence": 1,
   "rationale": "brief reason using only complaint text"
 }
 """
@@ -45,7 +45,7 @@ ambiguous. Do not use hidden labels or external knowledge. Return JSON only:
 
 PROMPT_IMPROVEMENT_PROMPT = """You improve a text-classification prompt.
 
-Write a revised prompt that keeps the same JSON output contract and allowed
+Write a proposed prompt that keeps the same JSON output contract and allowed
 label set. Make the prompt more discriminative using only the error analysis
 and sampled error cases provided.
 

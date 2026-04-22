@@ -1,9 +1,10 @@
 # Eval Driven Prompt Optimisation Agent
 
-This project is a small prototype for iterative LLM-based text classification.
-It classifies retail banking complaints, evaluates confusion patterns, asks an
-OpenAI model to analyse the errors, proposes a better classification prompt, and
-waits for human approval before running the next iteration.
+This project is a small prototype for iterative LLM-based text classification. It classifies retail banking complaints, evaluates confusion patterns, asks an OpenAI model to **analyse the errors, proposes a better classification prompt, and waits for human approval/edits** before running the next iteration.
+
+In this prototype, "training the model" means updating the classification prompt. The classification prompt is the model parameter being reviewed, accepted, and carried into later iterations.
+
+The dummy datasets used are carefully designed so that the LLM is not able to infer which label to choose just from the meaning of each label. It must summarise a map that links (a) the hidden highly-indicative keywords from the complaints and (b) the labels.
 
 ## Important Boundary
 
@@ -18,8 +19,9 @@ The classifier does not see:
 - `banking_complaint_class_keywords.py`
 - the sample's ground-truth label during classification
 
-Ground-truth labels from `banking_complaint_samples.py` are only used after
-prediction to build the confusion matrix and error cases.
+Ground-truth labels from `banking_complaint_training_samples.py`,
+`banking_complaint_validation_samples.py`, and `banking_complaint_test_samples.py`
+are only used after prediction to build confusion matrices and error cases.
 
 ## Setup
 
@@ -54,31 +56,29 @@ Or without installing the console script:
 python -m promptopt_agent.cli --iterations 3
 ```
 
+Each training iteration scores the training set, proposes an updated prompt `runs/prompt_*_proposed.txt`, then scores the validation set with that proposed prompt. Both `training` and `validation` results are recorded.
+
+At the end of each iteration, **You may manually edit `runs/prompt_*_proposed.txt`** before answering the terminal prompt. When you type `y`, the agent reloads the saved `runs/prompt_*_proposed.txt` and uses that reviewed/edited prompt for the next iteration.
+
 To resume later from a saved prompt file, pass `--initial-prompt`:
 
 ```bash
 promptopt-agent --initial-prompt runs/prompt_01_proposed.txt --iterations 2
 ```
 
-At the end of each iteration, review the proposed prompt file:
+To score the held-out test set separately from the training loop, pass `--score-test`. For final testing, provide the reviewed `*_proposed.txt` prompt you want to score:
 
-```text
-runs/prompt_01_proposed.txt
+```bash
+promptopt-agent --score-test --initial-prompt runs/prompt_02_proposed.txt
 ```
 
-You can edit and save that file before answering the terminal prompt. If you
-type `y`, the agent reloads the saved file and uses that reviewed prompt for the
-next classification/evaluation loop.
-
-The agent writes JSON artifacts, proposed prompts, and used prompts to `runs/`.
-For traceability, each iteration keeps both sides of the prompt handoff:
+Test scoring is written to:
 
 ```text
-runs/prompt_01_used.txt
-runs/prompt_01_proposed.txt
-runs/prompt_02_used.txt
-runs/prompt_02_proposed.txt
+runs/test_score.json
 ```
+
+For traceability, the agent writes JSON artifacts, proposed prompts, and used prompts to `runs/`.
 
 Prompt file meanings:
 
@@ -86,10 +86,23 @@ Prompt file meanings:
 - `prompt_01_proposed.txt`: should be the first improved version.
 - `prompt_02_used.txt`: should match whatever you accepted from `prompt_01_proposed.txt`.
 
+## Current Results
+
+**Accuracy** from the latest local runs:
+
+- Baseline Accuracy (by pure chance): `0.1`.
+- `prompt_01_proposed.txt`: validation from iteration 1 = `0.9667`; used in iteration 2 training = `0.9700`.
+- `prompt_02_proposed.txt`: validation from iteration 2 = `0.9667`; used in iteration 3 training = `0.9300`.
+- `prompt_03_proposed.txt`: validation from iteration 3 = `0.9333`; not worth any further iteration.
+
+The best prompt found so far is `prompt_01_proposed.txt`. Its held-out test Accuracy is at least `0.9` over multiple runs.
+
 ## Files
 
 - `banking_complaint_class_keywords.py`: dummy model-derived keyword data for discussion only.
-- `banking_complaint_samples.py`: dummy labelled evaluation set.
+- `banking_complaint_training_samples.py`: dummy labelled training set.
+- `banking_complaint_validation_samples.py`: 30 unique validation samples, one per positive keyword.
+- `banking_complaint_test_samples.py`: 30 unique test samples, one per positive keyword.
 - `src/promptopt_agent/taxonomy.py`: labels available to the classifier.
 - `src/promptopt_agent/classifier.py`: OpenAI-backed complaint classifier.
 - `src/promptopt_agent/evaluation.py`: confusion matrix and error-case logic.
@@ -109,6 +122,7 @@ After each iteration it also prints token usage for:
 - classification calls
 - error analysis
 - prompt improvement
+- validation scoring
 - iteration total
 - full run total
 

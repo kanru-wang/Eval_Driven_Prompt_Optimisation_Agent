@@ -11,8 +11,10 @@ def build_confusion_matrix(
     predictions: list[Prediction],
     class_labels: list[str],
 ) -> dict[str, dict[str, int]]:
-    labels = [*class_labels, "INVALID_LABEL"]
-    matrix = {actual: {predicted: 0 for predicted in labels} for actual in class_labels}
+    matrix = {
+        actual: {predicted: 0 for predicted in class_labels}
+        for actual in class_labels
+    }
     for prediction in predictions:
         if prediction.true_label is None:
             continue
@@ -45,7 +47,7 @@ def error_cases(
         for item in predictions
         if item.true_label != item.predicted_label
     ]
-    errors.sort(key=lambda item: (-float(item["confidence"]), int(item["sample_number"])))
+    errors.sort(key=lambda item: (-int(item["confidence"]), int(item["sample_number"])))
     return errors[:max_cases]
 
 

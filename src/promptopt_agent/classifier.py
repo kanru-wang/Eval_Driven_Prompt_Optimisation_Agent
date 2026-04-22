@@ -20,7 +20,7 @@ class Prediction:
     sample_number: int
     complaint_text: str
     predicted_label: str
-    confidence: float
+    confidence: int
     rationale: str
     true_label: str | None = None
 

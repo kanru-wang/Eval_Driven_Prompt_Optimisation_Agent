@@ -8,10 +8,10 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_valida
 
 
 class ClassificationOutput(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", strict=True)
 
     class_label: str = Field(description="Exactly one label from the allowed list.")
-    confidence: float = Field(ge=0.0, le=1.0)
+    confidence: int = Field(ge=1, le=10)
     rationale: str
 
 
@@ -41,14 +41,16 @@ class PromptImprovementOutput(BaseModel):
     @field_validator("proposed_prompt")
     @classmethod
     def proposed_prompt_must_not_be_empty(cls, value: str) -> str:
-        if not value.strip():
+        prompt = _normalize_prompt_text(value)
+        if not prompt.strip():
             raise ValueError("proposed_prompt must not be empty")
-        return value
+        return prompt
 
 
 def classification_response_schema(class_labels: list[str]) -> dict[str, Any]:
     schema = ClassificationOutput.model_json_schema()
     schema["properties"]["class_label"]["enum"] = class_labels
+    schema["properties"]["confidence"]["enum"] = list(range(1, 11))
     return _openai_strict_schema(schema)
 
 
@@ -87,6 +89,16 @@ def validation_error_message(exc: ValidationError | ValueError) -> str:
 
 def _model_dump(model: BaseModel) -> dict[str, Any]:
     return model.model_dump()
+
+
+def _normalize_prompt_text(value: str) -> str:
+    return (
+        value.replace("\\r\\n", "\n")
+        .replace("\\n", "\n")
+        .replace("\\t", "  ")
+        .replace('\\"', '"')
+        .strip()
+    )
 
 
 def _openai_strict_schema(value: Any) -> Any:

@@ -14,6 +14,18 @@ from promptopt_agent.prompts import DEFAULT_CLASSIFICATION_PROMPT
 
 
 @dataclass(frozen=True)
+class ScoreResult:
+    dataset_name: str
+    prompt: str
+    predictions: list[Prediction]
+    accuracy: float
+    confusion_matrix: dict[str, dict[str, int]]
+    top_confusions: list[dict[str, object]]
+    error_cases: list[dict[str, object]]
+    token_usage: TokenUsage
+
+
+@dataclass(frozen=True)
 class IterationResult:
     iteration: int
     prompt: str
@@ -25,6 +37,7 @@ class IterationResult:
     error_analysis: dict[str, object]
     proposed_prompt: str
     change_summary: list[str]
+    validation: ScoreResult
     token_usage: dict[str, TokenUsage]
 
 
@@ -54,6 +67,7 @@ class PromptOptimisationAgent:
         samples: list[ComplaintSample],
         *,
         iteration: int,
+        validation_samples: list[ComplaintSample],
         max_error_cases: int = 30,
         progress_callback: Callable[[int, int, Prediction], None] | None = None,
     ) -> IterationResult:
@@ -87,6 +101,13 @@ class PromptOptimisationAgent:
         change_summary = [
             str(item) for item in improvement.get("change_summary", [])
         ]
+        validation = self.score_samples(
+            validation_samples,
+            dataset_name="validation",
+            prompt=proposed_prompt,
+            max_error_cases=max_error_cases,
+            progress_callback=progress_callback,
+        )
 
         return IterationResult(
             iteration=iteration,
@@ -99,10 +120,12 @@ class PromptOptimisationAgent:
             error_analysis=analysis,
             proposed_prompt=proposed_prompt,
             change_summary=change_summary,
+            validation=validation,
             token_usage={
                 "classification": classification_usage,
                 "error_analysis": analysis_usage,
                 "prompt_improvement": improvement_usage,
+                "validation": validation.token_usage,
                 "iteration_total": self._llm.usage - iteration_start_usage,
                 "run_total": self._llm.usage,
             },
@@ -110,3 +133,34 @@ class PromptOptimisationAgent:
 
     def accept_prompt(self, proposed_prompt: str) -> None:
         self._prompt = proposed_prompt
+
+    def score_samples(
+        self,
+        samples: list[ComplaintSample],
+        *,
+        dataset_name: str,
+        prompt: str | None = None,
+        max_error_cases: int = 30,
+        progress_callback: Callable[[int, int, Prediction], None] | None = None,
+    ) -> ScoreResult:
+        score_start_usage = self._llm.usage
+        prompt_to_score = self._prompt if prompt is None else prompt
+        classifier = LLMComplaintClassifier(
+            llm=self._llm,
+            class_labels=self._class_labels,
+            classification_prompt=prompt_to_score,
+        )
+        predictions = classifier.classify_many(
+            samples,
+            progress_callback=progress_callback,
+        )
+        return ScoreResult(
+            dataset_name=dataset_name,
+            prompt=prompt_to_score,
+            predictions=predictions,
+            accuracy=accuracy(predictions),
+            confusion_matrix=build_confusion_matrix(predictions, self._class_labels),
+            top_confusions=top_confusions(predictions),
+            error_cases=error_cases(predictions, max_cases=max_error_cases),
+            token_usage=self._llm.usage - score_start_usage,
+        )

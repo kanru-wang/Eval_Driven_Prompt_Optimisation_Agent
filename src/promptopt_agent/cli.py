@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 from typing import Callable
 
-from promptopt_agent.agent import IterationResult, PromptOptimisationAgent
+from promptopt_agent.agent import IterationResult, PromptOptimisationAgent, ScoreResult
 from promptopt_agent.classifier import Prediction
 from promptopt_agent.data_loader import load_samples
 from promptopt_agent.llm import TokenUsage
@@ -19,6 +19,51 @@ def _repo_root() -> Path:
     return Path(__file__).resolve().parents[2]
 
 
+def _prediction_data(predictions: list[Prediction]) -> list[dict[str, object]]:
+    return [
+        {
+            "sample_number": item.sample_number,
+            "complaint_text": item.complaint_text,
+            "true_label": item.true_label,
+            "predicted_label": item.predicted_label,
+            "confidence": item.confidence,
+            "rationale": item.rationale,
+        }
+        for item in predictions
+    ]
+
+
+def _token_usage_data(usage: TokenUsage) -> dict[str, int]:
+    return {
+        "requests": usage.requests,
+        "prompt_tokens": usage.prompt_tokens,
+        "completion_tokens": usage.completion_tokens,
+        "total_tokens": usage.total_tokens,
+    }
+
+
+def _score_data(
+    result: ScoreResult,
+    *,
+    prompt_source: str | None = None,
+) -> dict[str, object]:
+    data: dict[str, object] = {
+        "dataset_name": result.dataset_name,
+    }
+    if prompt_source is not None:
+        data["prompt_source"] = prompt_source
+    data.update({
+        "prompt_used": result.prompt,
+        "accuracy": result.accuracy,
+        "top_confusions": result.top_confusions,
+        "confusion_matrix": result.confusion_matrix,
+        "error_cases": result.error_cases,
+        "token_usage": _token_usage_data(result.token_usage),
+        "predictions": _prediction_data(result.predictions),
+    })
+    return data
+
+
 def _write_iteration_artifacts(
     output_dir: Path,
     result: IterationResult,
@@ -27,33 +72,24 @@ def _write_iteration_artifacts(
     data = {
         "iteration": result.iteration,
         "prompt_used": result.prompt,
-        "accuracy": result.accuracy,
-        "top_confusions": result.top_confusions,
-        "confusion_matrix": result.confusion_matrix,
-        "error_cases": result.error_cases,
         "error_analysis": result.error_analysis,
         "change_summary": result.change_summary,
         "proposed_prompt": result.proposed_prompt,
+        "training": {
+            "dataset_name": "training",
+            "prompt_used": result.prompt,
+            "accuracy": result.accuracy,
+            "top_confusions": result.top_confusions,
+            "confusion_matrix": result.confusion_matrix,
+            "error_cases": result.error_cases,
+            "token_usage": _token_usage_data(result.token_usage["classification"]),
+            "predictions": _prediction_data(result.predictions),
+        },
+        "validation": _score_data(result.validation),
         "token_usage": {
-            name: {
-                "requests": usage.requests,
-                "prompt_tokens": usage.prompt_tokens,
-                "completion_tokens": usage.completion_tokens,
-                "total_tokens": usage.total_tokens,
-            }
+            name: _token_usage_data(usage)
             for name, usage in result.token_usage.items()
         },
-        "predictions": [
-            {
-                "sample_number": item.sample_number,
-                "complaint_text": item.complaint_text,
-                "true_label": item.true_label,
-                "predicted_label": item.predicted_label,
-                "confidence": item.confidence,
-                "rationale": item.rationale,
-            }
-            for item in result.predictions
-        ],
     }
     artifact_path = output_dir / f"iteration_{result.iteration:02d}.json"
     used_prompt_path = output_dir / f"prompt_{result.iteration:02d}_used.txt"
@@ -66,6 +102,21 @@ def _write_iteration_artifacts(
         "used_prompt": used_prompt_path,
         "proposed_prompt": proposed_prompt_path,
     }
+
+
+def _write_score_artifact(
+    output_dir: Path,
+    result: ScoreResult,
+    *,
+    prompt_source: str | None = None,
+) -> Path:
+    output_dir.mkdir(parents=True, exist_ok=True)
+    artifact_path = output_dir / f"{result.dataset_name}_score.json"
+    artifact_path.write_text(
+        json.dumps(_score_data(result, prompt_source=prompt_source), indent=2),
+        encoding="utf-8",
+    )
+    return artifact_path
 
 
 def _save_text(path: Path, content: str) -> None:
@@ -126,9 +177,29 @@ def main() -> None:
         description="Run eval-driven prompt optimisation for complaint classification."
     )
     parser.add_argument(
+        "--training-samples",
         "--samples",
-        default=str(_repo_root() / "banking_complaint_samples.py"),
-        help="Path to Python module containing COMPLAINT_SAMPLES.",
+        dest="training_samples",
+        default=str(_repo_root() / "banking_complaint_training_samples.py"),
+        help="Path to training Python module containing COMPLAINT_SAMPLES.",
+    )
+    parser.add_argument(
+        "--validation-samples",
+        default=str(_repo_root() / "banking_complaint_validation_samples.py"),
+        help="Path to validation Python module containing COMPLAINT_SAMPLES.",
+    )
+    parser.add_argument(
+        "--test-samples",
+        default=str(_repo_root() / "banking_complaint_test_samples.py"),
+        help="Path to test Python module containing COMPLAINT_SAMPLES.",
+    )
+    parser.add_argument(
+        "--score-test",
+        action="store_true",
+        help=(
+            "Score the test set once using the prompt passed by --initial-prompt and "
+            "exit without running training iterations."
+        ),
     )
     parser.add_argument(
         "--model",
@@ -161,7 +232,6 @@ def main() -> None:
     if not args.api_key:
         raise SystemExit("Missing API key. Set OPENAI_API_KEY or pass --api-key.")
 
-    samples = load_samples(args.samples)
     initial_prompt = (
         _load_prompt_file(Path(args.initial_prompt), description="Initial prompt")
         if args.initial_prompt
@@ -177,25 +247,63 @@ def main() -> None:
         print(f"Loaded initial prompt from: {args.initial_prompt}")
 
     output_dir = Path(args.output_dir)
+    if args.score_test:
+        if args.initial_prompt is None:
+            raise SystemExit(
+                "Test scoring requires --initial-prompt pointing to the prompt "
+                "file you want to evaluate, for example runs/prompt_01_proposed.txt."
+            )
+        test_samples = load_samples(args.test_samples)
+        print(f"\nScoring test set with {len(test_samples)} samples.")
+        score = agent.score_samples(
+            test_samples,
+            dataset_name="test",
+            progress_callback=_progress_callback(agent),
+        )
+        prompt_source = args.initial_prompt
+        artifact_path = _write_score_artifact(
+            output_dir,
+            score,
+            prompt_source=prompt_source,
+        )
+        print(f"\nTest accuracy: {score.accuracy:.3f}")
+        _print_usage("Test scoring", score.token_usage)
+        print(f"Prompt source: {prompt_source}")
+        print(f"Test score artifact written to: {artifact_path}")
+        return
+
+    training_samples = load_samples(args.training_samples)
+    validation_samples = load_samples(args.validation_samples)
     for iteration in range(1, args.iterations + 1):
-        print(f"\nStarting iteration {iteration} with {len(samples)} samples.")
+        print(
+            f"\nStarting iteration {iteration} with "
+            f"{len(training_samples)} training samples."
+        )
         result = agent.run_iteration(
-            samples,
+            training_samples,
             iteration=iteration,
+            validation_samples=validation_samples,
             progress_callback=_progress_callback(agent),
         )
         artifact_paths = _write_iteration_artifacts(output_dir, result)
 
         print(f"\nIteration {iteration}")
-        print(f"Accuracy: {result.accuracy:.3f}")
+        print(f"Training accuracy: {result.accuracy:.3f}")
+        print(f"Validation accuracy: {result.validation.accuracy:.3f}")
         print("Token usage:")
         _print_usage("- Classification", result.token_usage["classification"])
         _print_usage("- Error analysis", result.token_usage["error_analysis"])
         _print_usage("- Prompt improvement", result.token_usage["prompt_improvement"])
+        _print_usage("- Validation", result.token_usage["validation"])
         _print_usage("- Iteration total", result.token_usage["iteration_total"])
         _print_usage("- Run total", result.token_usage["run_total"])
-        print("Top confusions:")
+        print("Training top confusions:")
         for item in result.top_confusions:
+            print(
+                f"- {item['true_label']} -> {item['predicted_label']}: {item['count']}"
+            )
+        print("Validation top confusions:")
+        for item in result.validation.top_confusions:
             print(
                 f"- {item['true_label']} -> {item['predicted_label']}: {item['count']}"
             )
