@@ -8,15 +8,15 @@ import os
 from pathlib import Path
 from typing import Callable
 
-from promptopt_agent.agent import IterationResult, PromptOptimisationAgent, ScoreResult
-from promptopt_agent.classifier import Prediction
-from promptopt_agent.data_loader import load_samples
-from promptopt_agent.llm import TokenUsage
-from promptopt_agent.taxonomy import CLASS_LABELS
+from agent import IterationResult, PromptOptimisationAgent, ScoreResult
+from classifier import Prediction
+from data_loader import load_samples
+from llm import TokenUsage
+from taxonomy import CLASS_LABELS
 
 
 def _repo_root() -> Path:
-    return Path(__file__).resolve().parents[2]
+    return Path(__file__).resolve().parents[1]
 
 
 def _prediction_data(predictions: list[Prediction]) -> list[dict[str, object]]:
@@ -180,17 +180,17 @@ def main() -> None:
         "--training-samples",
         "--samples",
         dest="training_samples",
-        default=str(_repo_root() / "banking_complaint_training_samples.py"),
+        default=str(_repo_root() / "data" / "banking_complaint_training_samples.py"),
         help="Path to training Python module containing COMPLAINT_SAMPLES.",
     )
     parser.add_argument(
         "--validation-samples",
-        default=str(_repo_root() / "banking_complaint_validation_samples.py"),
+        default=str(_repo_root() / "data" / "banking_complaint_validation_samples.py"),
         help="Path to validation Python module containing COMPLAINT_SAMPLES.",
     )
     parser.add_argument(
         "--test-samples",
-        default=str(_repo_root() / "banking_complaint_test_samples.py"),
+        default=str(_repo_root() / "data" / "banking_complaint_test_samples.py"),
         help="Path to test Python module containing COMPLAINT_SAMPLES.",
     )
     parser.add_argument(

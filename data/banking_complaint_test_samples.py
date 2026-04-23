@@ -1,7 +1,8 @@
 """Test retail banking complaint samples for prompt/eval experiments.
 
 Each sample contains exactly one positive keyword from
-banking_complaint_class_keywords.py and is unique from the validation samples.
+data/banking_complaint_class_keywords.py and is unique from the validation
+samples.
 """
 
 COMPLAINT_SAMPLES = [

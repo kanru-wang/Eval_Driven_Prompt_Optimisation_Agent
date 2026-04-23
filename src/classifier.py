@@ -5,10 +5,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable
 
-from promptopt_agent.data_loader import ComplaintSample
-from promptopt_agent.llm import OpenAIJSONClient
-from promptopt_agent.prompts import classification_user_prompt
-from promptopt_agent.schemas import (
+from data_loader import ComplaintSample
+from llm import OpenAIJSONClient
+from prompts import classification_user_prompt
+from schemas import (
     classification_response_schema,
     validate_classification_output,
     validation_error_message,

@@ -5,12 +5,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable
 
-from promptopt_agent.classifier import LLMComplaintClassifier, Prediction
-from promptopt_agent.data_loader import ComplaintSample
-from promptopt_agent.evaluation import accuracy, build_confusion_matrix, error_cases, top_confusions
-from promptopt_agent.llm import OpenAIJSONClient, TokenUsage
-from promptopt_agent.optimizer import LLMPromptOptimizer
-from promptopt_agent.prompts import DEFAULT_CLASSIFICATION_PROMPT
+from classifier import LLMComplaintClassifier, Prediction
+from data_loader import ComplaintSample
+from evaluation import accuracy, build_confusion_matrix, error_cases, top_confusions
+from llm import OpenAIJSONClient, TokenUsage
+from optimizer import LLMPromptOptimizer
+from prompts import DEFAULT_CLASSIFICATION_PROMPT
 
 
 @dataclass(frozen=True)

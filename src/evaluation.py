@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections import Counter
 
-from promptopt_agent.classifier import Prediction
+from classifier import Prediction
 
 
 def build_confusion_matrix(

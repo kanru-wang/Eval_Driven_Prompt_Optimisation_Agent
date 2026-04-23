@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-from promptopt_agent.llm import OpenAIJSONClient
-from promptopt_agent.prompts import (
+from llm import OpenAIJSONClient
+from prompts import (
     ERROR_ANALYSIS_PROMPT,
     PROMPT_IMPROVEMENT_PROMPT,
     analysis_user_prompt,
     improvement_user_prompt,
 )
-from promptopt_agent.schemas import (
+from schemas import (
     error_analysis_response_schema,
     prompt_improvement_response_schema,
     validate_error_analysis_output,

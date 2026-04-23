@@ -16,11 +16,12 @@ The classifier sees:
 
 The classifier does not see:
 
-- `banking_complaint_class_keywords.py`
+- `data/banking_complaint_class_keywords.py`
 - the sample's ground-truth label during classification
 
-Ground-truth labels from `banking_complaint_training_samples.py`,
-`banking_complaint_validation_samples.py`, and `banking_complaint_test_samples.py`
+Ground-truth labels from `data/banking_complaint_training_samples.py`,
+`data/banking_complaint_validation_samples.py`, and
+`data/banking_complaint_test_samples.py`
 are only used after prediction to build confusion matrices and error cases.
 
 ## Setup
@@ -28,6 +29,9 @@ are only used after prediction to build confusion matrices and error cases.
 ```bash
 pip install -e .
 ```
+
+This installs the `promptopt-agent` console command and makes the modules in
+`src/` importable from your environment.
 
 Set your API key:
 
@@ -50,10 +54,25 @@ By default, the agent uses `gpt-5-nano`. You can override this with
 promptopt-agent --iterations 3
 ```
 
-Or without installing the console script:
+Or run directly from the source tree by putting `src/` on `PYTHONPATH`.
+
+On PowerShell:
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m cli --iterations 3
+```
+
+On bash:
 
 ```bash
-python -m promptopt_agent.cli --iterations 3
+PYTHONPATH=src python -m cli --iterations 3
+```
+
+If you already ran `pip install -e .`, this also works:
+
+```bash
+python -m cli --iterations 3
 ```
 
 Each training iteration scores the training set, proposes an updated prompt `runs/prompt_*_proposed.txt`, then scores the validation set with that proposed prompt. Both `training` and `validation` results are recorded.
@@ -99,15 +118,15 @@ The best prompt found so far is `prompt_01_proposed.txt`. Its held-out test Accu
 
 ## Files
 
-- `banking_complaint_class_keywords.py`: dummy model-derived keyword data for discussion only.
-- `banking_complaint_training_samples.py`: dummy labelled training set.
-- `banking_complaint_validation_samples.py`: 30 unique validation samples, one per positive keyword.
-- `banking_complaint_test_samples.py`: 30 unique test samples, one per positive keyword.
-- `src/promptopt_agent/taxonomy.py`: labels available to the classifier.
-- `src/promptopt_agent/classifier.py`: OpenAI-backed complaint classifier.
-- `src/promptopt_agent/evaluation.py`: confusion matrix and error-case logic.
-- `src/promptopt_agent/optimizer.py`: OpenAI-backed error analysis and prompt rewriting.
-- `src/promptopt_agent/cli.py`: human-in-the-loop iteration runner.
+- `data/banking_complaint_class_keywords.py`: dummy model-derived keyword data for discussion only.
+- `data/banking_complaint_training_samples.py`: dummy labelled training set.
+- `data/banking_complaint_validation_samples.py`: 30 unique validation samples, one per positive keyword.
+- `data/banking_complaint_test_samples.py`: 30 unique test samples, one per positive keyword.
+- `src/taxonomy.py`: labels available to the classifier.
+- `src/classifier.py`: OpenAI-backed complaint classifier.
+- `src/evaluation.py`: confusion matrix and error-case logic.
+- `src/optimizer.py`: OpenAI-backed error analysis and prompt rewriting.
+- `src/cli.py`: human-in-the-loop iteration runner.
 
 ## Token Usage Tracking
 

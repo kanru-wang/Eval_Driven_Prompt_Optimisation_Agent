@@ -9,10 +9,19 @@ dependencies = [
 ]
 
 [project.scripts]
-promptopt-agent = "promptopt_agent.cli:main"
+promptopt-agent = "cli:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
-
-[tool.setuptools.packages.find]
-where = ["src"]
+py-modules = [
+    "agent",
+    "classifier",
+    "cli",
+    "data_loader",
+    "evaluation",
+    "llm",
+    "optimizer",
+    "prompts",
+    "schemas",
+    "taxonomy",
+]
