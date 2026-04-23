@@ -35,8 +35,11 @@ class IterationResult:
     top_confusions: list[dict[str, object]]
     error_cases: list[dict[str, object]]
     error_analysis: dict[str, object]
+    original_proposed_prompt: str
     proposed_prompt: str
+    initial_change_summary: list[str]
     change_summary: list[str]
+    prompt_review: dict[str, object]
     validation: ScoreResult
     token_usage: dict[str, TokenUsage]
 
@@ -97,10 +100,40 @@ class PromptOptimisationAgent:
         )
         improvement_usage = self._llm.usage - improvement_start_usage
 
-        proposed_prompt = str(improvement.get("proposed_prompt", self._prompt))
-        change_summary = [
+        original_proposed_prompt = str(improvement.get("proposed_prompt", self._prompt))
+        initial_change_summary = [
             str(item) for item in improvement.get("change_summary", [])
         ]
+
+        review_start_usage = self._llm.usage
+        prompt_review = optimizer.review_prompt(
+            current_prompt=self._prompt,
+            proposed_prompt=original_proposed_prompt,
+            error_analysis=analysis,
+            error_cases=selected_errors,
+        )
+        review_usage = self._llm.usage - review_start_usage
+
+        proposed_prompt = original_proposed_prompt
+        change_summary = initial_change_summary
+        rewrite_usage = TokenUsage()
+        if bool(prompt_review.get("needs_rewrite", False)):
+            rewrite_start_usage = self._llm.usage
+            rewrite = optimizer.improve_prompt(
+                current_prompt=self._prompt,
+                error_analysis=analysis,
+                error_cases=selected_errors,
+                draft_prompt=original_proposed_prompt,
+                review_feedback=str(prompt_review.get("rewrite_feedback", "")),
+            )
+            rewrite_usage = self._llm.usage - rewrite_start_usage
+            proposed_prompt = str(
+                rewrite.get("proposed_prompt", original_proposed_prompt)
+            )
+            change_summary = [
+                str(item) for item in rewrite.get("change_summary", [])
+            ]
+
         validation = self.score_samples(
             validation_samples,
             dataset_name="validation",
@@ -118,13 +151,18 @@ class PromptOptimisationAgent:
             top_confusions=top_confusions(predictions),
             error_cases=selected_errors,
             error_analysis=analysis,
+            original_proposed_prompt=original_proposed_prompt,
             proposed_prompt=proposed_prompt,
+            initial_change_summary=initial_change_summary,
             change_summary=change_summary,
+            prompt_review=prompt_review,
             validation=validation,
             token_usage={
                 "classification": classification_usage,
                 "error_analysis": analysis_usage,
                 "prompt_improvement": improvement_usage,
+                "prompt_review": review_usage,
+                "prompt_rewrite": rewrite_usage,
                 "validation": validation.token_usage,
                 "iteration_total": self._llm.usage - iteration_start_usage,
                 "run_total": self._llm.usage,

@@ -6,14 +6,18 @@ from llm import OpenAIJSONClient
 from prompts import (
     ERROR_ANALYSIS_PROMPT,
     PROMPT_IMPROVEMENT_PROMPT,
+    PROMPT_REVIEW_PROMPT,
     analysis_user_prompt,
     improvement_user_prompt,
+    prompt_review_user_prompt,
 )
 from schemas import (
     error_analysis_response_schema,
     prompt_improvement_response_schema,
+    prompt_review_response_schema,
     validate_error_analysis_output,
     validate_prompt_improvement_output,
+    validate_prompt_review_output,
     validation_error_message,
 )
 
@@ -49,6 +53,9 @@ class LLMPromptOptimizer:
         current_prompt: str,
         error_analysis: dict[str, object],
         error_cases: list[dict[str, object]],
+        *,
+        draft_prompt: str | None = None,
+        review_feedback: str | None = None,
     ) -> dict[str, object]:
         result = self._llm.complete_json(
             system_prompt=PROMPT_IMPROVEMENT_PROMPT,
@@ -57,6 +64,8 @@ class LLMPromptOptimizer:
                 class_labels=self._class_labels,
                 error_analysis=error_analysis,
                 error_cases=error_cases,
+                draft_prompt=draft_prompt,
+                review_feedback=review_feedback,
             ),
             temperature=0.3,
             response_schema=prompt_improvement_response_schema(),
@@ -64,5 +73,30 @@ class LLMPromptOptimizer:
         )
         try:
             return validate_prompt_improvement_output(result)
+        except ValueError as exc:
+            raise ValueError(validation_error_message(exc)) from exc
+
+    def review_prompt(
+        self,
+        current_prompt: str,
+        proposed_prompt: str,
+        error_analysis: dict[str, object],
+        error_cases: list[dict[str, object]],
+    ) -> dict[str, object]:
+        result = self._llm.complete_json(
+            system_prompt=PROMPT_REVIEW_PROMPT,
+            user_prompt=prompt_review_user_prompt(
+                current_prompt=current_prompt,
+                proposed_prompt=proposed_prompt,
+                class_labels=self._class_labels,
+                error_analysis=error_analysis,
+                error_cases=error_cases,
+            ),
+            temperature=0.1,
+            response_schema=prompt_review_response_schema(),
+            schema_name="prompt_review",
+        )
+        try:
+            return validate_prompt_review_output(result)
         except ValueError as exc:
             raise ValueError(validation_error_message(exc)) from exc

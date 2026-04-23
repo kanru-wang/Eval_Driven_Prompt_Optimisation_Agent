@@ -46,13 +46,40 @@ ambiguous. Do not use hidden labels or external knowledge. Return JSON only:
 PROMPT_IMPROVEMENT_PROMPT = """You improve a text-classification prompt.
 
 Write a proposed prompt that keeps the same JSON output contract and allowed
-label set. Make the prompt more discriminative using only the error analysis
-and sampled error cases provided.
+label set. Make the prompt more discriminative using the error analysis and
+sampled error cases provided.
+
+If draft_prompt and review_feedback are provided, rewrite that draft prompt
+using the same optimisation context plus the review feedback.
 
 Return JSON only:
 {
   "proposed_prompt": "...",
   "change_summary": ["...", "..."]
+}
+"""
+
+
+PROMPT_REVIEW_PROMPT = """
+You review a proposed text-classification prompt.
+
+Check whether the proposed prompt has highly likely overfitting risks, such as very sample-specific wording, brittle exact phrases, or rules that are too narrowly tied to the provided error cases.
+Check whether the prompt includes personal information or asks the classifier to rely on personal information.
+Check duplicate or redundant rules.
+Check conflicting rules.
+
+For each findings list, include only actual problems. If there are no actual problems for that category, return an empty list. Do not add reassuring notes or cautions as findings.
+
+Only request a rewrite when the issue is material. If the prompt is acceptable, set needs_rewrite to false and leave rewrite_feedback empty.
+
+Return JSON only:
+{
+  "needs_rewrite": false,
+  "overfitting_risks": ["..."],
+  "pii_risks": ["..."],
+  "duplicate_rules": ["..."],
+  "conflicting_rules": ["..."],
+  "rewrite_feedback": "..."
 }
 """
 
@@ -90,10 +117,34 @@ def improvement_user_prompt(
     class_labels: list[str],
     error_analysis: dict[str, object],
     error_cases: list[dict[str, object]],
+    *,
+    draft_prompt: str | None = None,
+    review_feedback: str | None = None,
+) -> str:
+    payload: dict[str, object] = {
+        "current_prompt": current_prompt,
+        "allowed_class_labels": class_labels,
+        "error_analysis": error_analysis,
+        "error_cases": error_cases,
+    }
+    if draft_prompt is not None:
+        payload["draft_prompt"] = draft_prompt
+    if review_feedback is not None:
+        payload["review_feedback"] = review_feedback
+    return json.dumps(payload, indent=2)
+
+
+def prompt_review_user_prompt(
+    current_prompt: str,
+    proposed_prompt: str,
+    class_labels: list[str],
+    error_analysis: dict[str, object],
+    error_cases: list[dict[str, object]],
 ) -> str:
     return json.dumps(
         {
             "current_prompt": current_prompt,
+            "proposed_prompt": proposed_prompt,
             "allowed_class_labels": class_labels,
             "error_analysis": error_analysis,
             "error_cases": error_cases,

@@ -47,6 +47,25 @@ class PromptImprovementOutput(BaseModel):
         return prompt
 
 
+class PromptReviewOutput(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+
+    needs_rewrite: bool
+    overfitting_risks: list[str]
+    pii_risks: list[str]
+    duplicate_rules: list[str]
+    conflicting_rules: list[str]
+    rewrite_feedback: str
+
+    @field_validator("rewrite_feedback")
+    @classmethod
+    def rewrite_feedback_must_match_decision(cls, value: str, info) -> str:
+        feedback = value.strip()
+        if info.data.get("needs_rewrite") and not feedback:
+            raise ValueError("rewrite_feedback is required when needs_rewrite is true")
+        return feedback
+
+
 def classification_response_schema(class_labels: list[str]) -> dict[str, Any]:
     schema = ClassificationOutput.model_json_schema()
     schema["properties"]["class_label"]["enum"] = class_labels
@@ -60,6 +79,10 @@ def error_analysis_response_schema() -> dict[str, Any]:
 
 def prompt_improvement_response_schema() -> dict[str, Any]:
     return _openai_strict_schema(PromptImprovementOutput.model_json_schema())
+
+
+def prompt_review_response_schema() -> dict[str, Any]:
+    return _openai_strict_schema(PromptReviewOutput.model_json_schema())
 
 
 def validate_classification_output(
@@ -81,6 +104,10 @@ def validate_error_analysis_output(result: dict[str, Any]) -> dict[str, Any]:
 
 def validate_prompt_improvement_output(result: dict[str, Any]) -> dict[str, Any]:
     return _model_dump(PromptImprovementOutput.model_validate(result))
+
+
+def validate_prompt_review_output(result: dict[str, Any]) -> dict[str, Any]:
+    return _model_dump(PromptReviewOutput.model_validate(result))
 
 
 def validation_error_message(exc: ValidationError | ValueError) -> str:

@@ -1,6 +1,8 @@
 # Eval Driven Prompt Optimisation Agent
 
-This project is a small prototype for iterative LLM-based text classification. It classifies retail banking complaints, evaluates confusion patterns, asks an OpenAI model to **analyse the errors, proposes a better classification prompt, and waits for human approval/edits** before running the next iteration.
+This project is a small prototype for iterative LLM-based text classification. **Main steps are: (1) LLM classifies retail banking customers' complaints, (2) LLM analyses errors and confusion patterns, (3) LLM proposes a better classification prompt, (4) An LLM-as-a-judge agent checks the proposed prompt for any issue in rules (overfitting, redundant or conflicting) and PII leakage, and decides whether to redo Step 3 or go to Step 5, (5) Wait for human approval/edits, (6) Run the next iteration.**
+
+**The end product is an optimised text classification prompt.**
 
 In this prototype, "training the model" means updating the classification prompt. The classification prompt is the model parameter being reviewed, accepted, and carried into later iterations.
 
@@ -63,19 +65,13 @@ $env:PYTHONPATH = "src"
 python -m cli --iterations 3
 ```
 
-On bash:
-
-```bash
-PYTHONPATH=src python -m cli --iterations 3
-```
-
 If you already ran `pip install -e .`, this also works:
 
 ```bash
 python -m cli --iterations 3
 ```
 
-Each training iteration scores the training set, proposes an updated prompt `runs/prompt_*_proposed.txt`, then scores the validation set with that proposed prompt. Both `training` and `validation` results are recorded.
+Each training iteration scores the training set, proposes an updated prompt, reviews it for over-specific wording, PII, duplicate rules, and conflicting rules, optionally rewrites it once, then scores the validation set with the final proposed prompt in `runs/prompt_*_proposed.txt`. Both `training` and `validation` results are recorded.
 
 At the end of each iteration, **You may manually edit `runs/prompt_*_proposed.txt`** before answering the terminal prompt. When you type `y`, the agent reloads the saved `runs/prompt_*_proposed.txt` and uses that reviewed/edited prompt for the next iteration.
 
@@ -84,6 +80,11 @@ To resume later from a saved prompt file, pass `--initial-prompt`:
 ```bash
 promptopt-agent --initial-prompt runs/prompt_01_proposed.txt --iterations 2
 ```
+
+When `--initial-prompt` points to a saved `prompt_XX_*.txt` file, the CLI
+infers that the next run should continue at iteration `XX + 1`. For example,
+resuming from `runs/prompt_01_proposed.txt --iterations 2` runs iteration 2 and
+writes `runs/iteration_02.json`.
 
 To score the held-out test set separately from the training loop, pass `--score-test`. For final testing, provide the reviewed `*_proposed.txt` prompt you want to score:
 
@@ -102,7 +103,8 @@ For traceability, the agent writes JSON artifacts, proposed prompts, and used pr
 Prompt file meanings:
 
 - `prompt_01_used.txt`: should match `DEFAULT_CLASSIFICATION_PROMPT`.
-- `prompt_01_proposed.txt`: should be the first improved version.
+- `prompt_01_original_proposed.txt`: the first prompt proposed before the review guardrail.
+- `prompt_01_proposed.txt`: the final proposed prompt after the review guardrail and optional one-time rewrite. You may edit it, before you type `y` for triggering the next iteration.
 - `prompt_02_used.txt`: should match whatever you accepted from `prompt_01_proposed.txt`.
 
 ## Current Results
@@ -110,11 +112,12 @@ Prompt file meanings:
 **Accuracy** from the latest local runs:
 
 - Baseline Accuracy (by pure chance): `0.1`.
-- `prompt_01_proposed.txt`: validation from iteration 1 = `0.9667`; used in iteration 2 training = `0.9700`.
-- `prompt_02_proposed.txt`: validation from iteration 2 = `0.9667`; used in iteration 3 training = `0.9300`.
-- `prompt_03_proposed.txt`: validation from iteration 3 = `0.9333`; not worth any further iteration.
+- `prompt_01_proposed.txt`: validation from iteration 1 = `0.9000`; used in iteration 2 training = `0.9500`.
+- `prompt_02_proposed.txt`: validation from iteration 2 = `0.9333`; used in iteration 3 training = `0.9400`.
+- `prompt_03_proposed.txt`: validation from iteration 3 = `0.9333`; did not improve over `prompt_02_proposed.txt` on validation.
+- Held-out test with `prompt_02_proposed.txt`: `0.9333`.
 
-The best prompt found so far is `prompt_01_proposed.txt`. Its held-out test Accuracy is at least `0.9` over multiple runs.
+The best prompt found so far is `prompt_02_proposed.txt`. It achieved validation Accuracy `0.9333` and held-out test Accuracy `0.9333`.
 
 ## Files
 
@@ -125,7 +128,7 @@ The best prompt found so far is `prompt_01_proposed.txt`. Its held-out test Accu
 - `src/taxonomy.py`: labels available to the classifier.
 - `src/classifier.py`: OpenAI-backed complaint classifier.
 - `src/evaluation.py`: confusion matrix and error-case logic.
-- `src/optimizer.py`: OpenAI-backed error analysis and prompt rewriting.
+- `src/optimizer.py`: OpenAI-backed error analysis, prompt rewriting, and prompt review.
 - `src/cli.py`: human-in-the-loop iteration runner.
 
 ## Token Usage Tracking
@@ -141,6 +144,8 @@ After each iteration it also prints token usage for:
 - classification calls
 - error analysis
 - prompt improvement
+- prompt review
+- prompt rewrite, when the review guardrail asks for one
 - validation scoring
 - iteration total
 - full run total

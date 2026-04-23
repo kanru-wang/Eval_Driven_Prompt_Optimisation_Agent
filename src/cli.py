@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 from pathlib import Path
 from typing import Callable
 
@@ -73,7 +74,10 @@ def _write_iteration_artifacts(
         "iteration": result.iteration,
         "prompt_used": result.prompt,
         "error_analysis": result.error_analysis,
+        "initial_change_summary": result.initial_change_summary,
         "change_summary": result.change_summary,
+        "prompt_review": result.prompt_review,
+        "original_proposed_prompt": result.original_proposed_prompt,
         "proposed_prompt": result.proposed_prompt,
         "training": {
             "dataset_name": "training",
@@ -93,13 +97,18 @@ def _write_iteration_artifacts(
     }
     artifact_path = output_dir / f"iteration_{result.iteration:02d}.json"
     used_prompt_path = output_dir / f"prompt_{result.iteration:02d}_used.txt"
+    original_proposed_prompt_path = (
+        output_dir / f"prompt_{result.iteration:02d}_original_proposed.txt"
+    )
     proposed_prompt_path = output_dir / f"prompt_{result.iteration:02d}_proposed.txt"
     artifact_path.write_text(json.dumps(data, indent=2), encoding="utf-8")
     _save_text(used_prompt_path, result.prompt)
+    _save_text(original_proposed_prompt_path, result.original_proposed_prompt)
     _save_text(proposed_prompt_path, result.proposed_prompt)
     return {
         "artifact": artifact_path,
         "used_prompt": used_prompt_path,
+        "original_proposed_prompt": original_proposed_prompt_path,
         "proposed_prompt": proposed_prompt_path,
     }
 
@@ -142,6 +151,22 @@ def _load_reviewed_prompt(prompt_path: Path) -> str:
     return _load_prompt_file(prompt_path, description="Reviewed prompt")
 
 
+def _starting_iteration(initial_prompt_path: str | None) -> int:
+    if initial_prompt_path is None:
+        return 1
+    match = re.search(
+        r"prompt_(\d+?)_(?:original_)?(?:proposed|used)\.txt$",
+        Path(initial_prompt_path).name,
+    )
+    if match is None:
+        return 1
+    return int(match.group(1)) + 1
+
+
+def _rewrite_happened(result: IterationResult) -> bool:
+    return result.token_usage["prompt_rewrite"].requests > 0
+
+
 def _render_progress(current: int, total: int, usage: TokenUsage) -> None:
     width = 28
     filled = int(width * current / total) if total else width
@@ -162,6 +187,12 @@ def _print_usage(title: str, usage: TokenUsage) -> None:
         f"prompt={usage.prompt_tokens}, completion={usage.completion_tokens}, "
         f"total={usage.total_tokens}"
     )
+
+
+def _print_section(title: str) -> None:
+    print(f"\n{'=' * 72}")
+    print(title)
+    print("-" * 72)
 
 
 def _progress_callback(agent: PromptOptimisationAgent):
@@ -274,7 +305,15 @@ def main() -> None:
 
     training_samples = load_samples(args.training_samples)
     validation_samples = load_samples(args.validation_samples)
-    for iteration in range(1, args.iterations + 1):
+    start_iteration = _starting_iteration(args.initial_prompt)
+    if start_iteration > args.iterations:
+        raise SystemExit(
+            f"Initial prompt implies starting at iteration {start_iteration}, "
+            f"but --iterations is {args.iterations}. Increase --iterations to at "
+            f"least {start_iteration} or use an earlier prompt file."
+        )
+
+    for iteration in range(start_iteration, args.iterations + 1):
         print(
             f"\nStarting iteration {iteration} with "
             f"{len(training_samples)} training samples."
@@ -287,32 +326,63 @@ def main() -> None:
         )
         artifact_paths = _write_iteration_artifacts(output_dir, result)
 
-        print(f"\nIteration {iteration}")
+        _print_section(f"Iteration {iteration}: Training classification")
         print(f"Training accuracy: {result.accuracy:.3f}")
-        print(f"Validation accuracy: {result.validation.accuracy:.3f}")
-        print("Token usage:")
-        _print_usage("- Classification", result.token_usage["classification"])
-        _print_usage("- Error analysis", result.token_usage["error_analysis"])
-        _print_usage("- Prompt improvement", result.token_usage["prompt_improvement"])
-        _print_usage("- Validation", result.token_usage["validation"])
-        _print_usage("- Iteration total", result.token_usage["iteration_total"])
-        _print_usage("- Run total", result.token_usage["run_total"])
         print("Training top confusions:")
         for item in result.top_confusions:
             print(
                 f"- {item['true_label']} -> {item['predicted_label']}: {item['count']}"
             )
+
+        _print_section("Prompt improvement")
+        print("Change summary:")
+        for item in result.change_summary:
+            print(f"- {item}")
+        print("\nOriginal proposed prompt:\n")
+        print(result.original_proposed_prompt)
+
+        _print_section("Prompt review")
+        print(f"- Needs rewrite: {result.prompt_review['needs_rewrite']}")
+        for item in result.prompt_review["overfitting_risks"]:
+            print(f"- Overfitting risk: {item}")
+        for item in result.prompt_review["pii_risks"]:
+            print(f"- PII risk: {item}")
+        for item in result.prompt_review["duplicate_rules"]:
+            print(f"- Duplicate rule: {item}")
+        for item in result.prompt_review["conflicting_rules"]:
+            print(f"- Conflicting rule: {item}")
+        if result.prompt_review["rewrite_feedback"]:
+            print(f"- Rewrite feedback: {result.prompt_review['rewrite_feedback']}")
+
+        if _rewrite_happened(result):
+            _print_section("Prompt rewrite")
+            print("\nFinal proposed prompt after prompt review rewrite:\n")
+            print(result.proposed_prompt)
+
+        _print_section("Validation")
+        print(f"Validation accuracy: {result.validation.accuracy:.3f}")
         print("Validation top confusions:")
         for item in result.validation.top_confusions:
             print(
                 f"- {item['true_label']} -> {item['predicted_label']}: {item['count']}"
             )
-        print("\nChange summary:")
-        for item in result.change_summary:
-            print(f"- {item}")
-        print("\nProposed prompt:\n")
-        print(result.proposed_prompt)
-        print(f"\nArtifacts written to: {output_dir}")
+
+        _print_section("Token usage")
+        _print_usage("- Classification", result.token_usage["classification"])
+        _print_usage("- Error analysis", result.token_usage["error_analysis"])
+        _print_usage("- Prompt improvement", result.token_usage["prompt_improvement"])
+        _print_usage("- Prompt review", result.token_usage["prompt_review"])
+        _print_usage("- Prompt rewrite", result.token_usage["prompt_rewrite"])
+        _print_usage("- Validation", result.token_usage["validation"])
+        _print_usage("- Iteration total", result.token_usage["iteration_total"])
+        _print_usage("- Run total", result.token_usage["run_total"])
+
+        _print_section("Artifacts")
+        print(f"Artifacts written to: {output_dir}")
+        print(
+            "Original proposed prompt: "
+            f"{artifact_paths['original_proposed_prompt']}"
+        )
         print(f"Review/edit proposed prompt: {artifact_paths['proposed_prompt']}")
 
         if iteration == args.iterations:
